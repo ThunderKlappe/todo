@@ -1,0 +1,78 @@
+body{
+    box-sizing: border-box;
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background-color: #F6EABE;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #2f6363;
+}
+
+#header{
+    height: 72px;
+    background-color: #F6D7A7;
+    color: #2f6363;
+    font-size: 32px;
+    font-weight: 900;
+    display: flex;
+    align-items: center;
+    padding-left: 60px;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1;
+}
+
+#content{
+    margin-top: 100px;
+    display: flex;
+    width: -webkit-fill-available-
+}
+#side-panel{
+    flex: 1;
+    background-color: #2f6363;
+    color: #F6D7A7;
+}
+#main-display{
+    flex: 5;
+}
+
+#add-project-button-container{
+    position: fixed;
+    top: 100px;
+    right: 60px;
+    display: flex;
+}
+#add-project-button{
+    height: 50px;
+    width: 50px;
+    border-radius: 100px;
+    background-color: #C8E3D4;
+    border: 3px solid #2f6363;
+    color: #2f6363;
+    font-size: 40px;
+    font-weight: bold;
+    text-align: center;
+    padding: 0px 10px;
+    
+}
+#add-project-button.hoverable{
+    transition: .25s;
+}
+#add-project-button:hover{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 120px;
+    background-color: #85af98;
+}
+#add-project-button span.hoverable{
+    transition: .05s;
+    font-size: 20px;
+    opacity: 0;
+}
+#add-project-button:hover span{
+    opacity: 1;
+    transition: 1ms;
+}

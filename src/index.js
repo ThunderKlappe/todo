@@ -1,3 +1,8 @@
 import './style.css'
+import Project from './Project.js'
 
-setTimeout(()=> document.querySelectorAll(".make-hoverable").forEach(ele => ele.classList.add('hoverable'), 5));
+const fixAnim = (()=>{
+    setTimeout(()=> document.querySelectorAll(".make-hoverable").forEach(ele => {
+        ele.classList.add('hoverable');
+        ele.classList.remove('make-hoverable')}, 1));
+})();

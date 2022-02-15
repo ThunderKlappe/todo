@@ -75,10 +75,12 @@ body{
     width: 120px;
     background-color: #87AAAA;
 }
-#add-project-button span.hoverable{
-    transition: .05s;
+#add-project-button span{
     font-size: 20px;
     opacity: 0;
+}
+#add-project-button span.hoverable{
+    transition: .05s;
 }
 #add-project-button:hover span{
     opacity: 1;

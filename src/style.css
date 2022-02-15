@@ -25,17 +25,25 @@ body{
 }
 
 #content{
-    margin-top: 100px;
+    margin-top: 72px;
     display: flex;
-    width: -webkit-fill-available-
+    width: -webkit-fill-available;
 }
 #side-panel{
     flex: 1;
     background-color: #2f6363;
     color: #F6D7A7;
+    min-height: 90.1vh;
+    padding-top: 20px;
+    border-top-right-radius: 30px;
+}
+.side-header{
+    font-size: 24px;
+    padding-left: 20px;
+    padding-bottom: 8px;
 }
 #main-display{
-    flex: 5;
+    flex: 4;
 }
 
 #add-project-button-container{
@@ -65,7 +73,7 @@ body{
     justify-content: center;
     align-items: center;
     width: 120px;
-    background-color: #85af98;
+    background-color: #87AAAA;
 }
 #add-project-button span.hoverable{
     transition: .05s;

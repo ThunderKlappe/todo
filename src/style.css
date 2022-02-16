@@ -90,15 +90,13 @@ body{
 }
 
 #add-project-button span{
-    font-size: 20px;
-    opacity: 0;
+    font-size: 0%;
 }
 #add-project-button span.hoverable{
     transition: .05s;
 }
 #add-project-button:hover span, #add-project-button span.active{
-    opacity: 1;
-    transition: 1ms;
+    font-size: 20px;
 }
 #new-proj-input-container{
     padding: 8px 15px;

@@ -4,8 +4,15 @@ import EventHandler from "./EventHandler";
 const DOMManip = (()=>{
     const getElement = (selector)=>document.querySelector(selector)
     const getElements = (selector)=>document.querySelectorAll(selector)
+
+    const fixStartingAnimations = ()=>{
+        const hoverable = getElements(".make-hoverable")
+        hoverable.forEach(ele => {
+            ele.classList.add('hoverable');
+            ele.classList.remove('make-hoverable')})
+    }
     
-    const makeNewElement = (type, id='', HTMLClass = '', text = '') =>{
+    const _makeNewElement = (type, id='', HTMLClass = '', text = '') =>{
         const newElem = document.createElement(type);
         if(id != ''){
             newElem.setAttribute("id", id);
@@ -17,22 +24,22 @@ const DOMManip = (()=>{
     
         return newElem;
     }
-    const removeElement = (elementID) =>{
+    const _removeElement = (elementID) =>{
         getElement(elementID).remove();
     }
-    const toggleActive = (elementID) =>{
+    const _toggleActive = (elementID) =>{
         const element = getElement(elementID)
         element.classList.contains('active')? element.classList.remove('active') : element.classList.add('active');
     }
 
     const setupNewProject = ()=>{
-        toggleActive('#add-project-button');
-        toggleActive('#add-project-button-text');
-        const newProjInputContainer = makeNewElement('div', 'new-proj-input-container');
-        const newProjInput = makeNewElement('input', 'new-proj-input');
+        _toggleActive('#add-project-button');
+        _toggleActive('#add-project-button-text');
+        const newProjInputContainer = _makeNewElement('div', 'new-proj-input-container');
+        const newProjInput = _makeNewElement('input', 'new-proj-input');
         newProjInput.setAttribute('type', 'text')
         newProjInput.setAttribute('value', 'Project Title')
-        const newProjAddButton = makeNewElement('button', 'new-proj-add-button', 'add-button', 'Submit');
+        const newProjAddButton = _makeNewElement('button', 'new-proj-add-button', 'add-button', 'Submit');
 
         newProjInputContainer.appendChild(newProjInput);
         newProjInputContainer.appendChild(newProjAddButton);
@@ -41,22 +48,36 @@ const DOMManip = (()=>{
 
         EventHandler.addProjectSubmission();
     }
-    const removeSubEntries = (element)=>{
+    const getNewProjTitle = ()=>{
+        return DOMManip.getElement('#new-proj-input').value;
+    }
+    
+    const _removeSubEntries = (element)=>{
         for(let i = element.childNodes.length; i > 2; i--){
             element.childNodes[i-1].remove();
         }
     }
-    const updateProjects = ()=>{
+    const _updateProjects = ()=>{
         const projectTab = getElement('#projects-side');
-        removeSubEntries(projectTab);
+        _removeSubEntries(projectTab);
         projectFunctions.getAllProjects().forEach((proj, index)=> projectTab.appendChild(
-            makeNewElement('div', `project-${index}`, 'project-side-label', proj.getTitle())))
+            _makeNewElement('div', `project-${index}`, 'project-side-label', proj.getTitle())))
     }
-    const expandToggle =()=>{
+
+    const addProjectToList = ()=>{
+        _removeElement("#new-proj-input-container");
+        EventHandler.activateAddButton();
+        _toggleActive('#add-project-button');
+        _toggleActive('#add-project-button-text');
+        _updateProjects();
+    }
+
+    const expandToggle = (e)=>{
 
     }
 
-    return {makeNewElement, removeElement, toggleActive, getElement, getElements, setupNewProject, updateProjects}
+    return {getElement, getElements, fixStartingAnimations, setupNewProject, getNewProjTitle, 
+            addProjectToList, expandToggle}
 })();
 
 export default DOMManip;

@@ -41,15 +41,19 @@ const DOMManip = (()=>{
 
         EventHandler.addProjectSubmission();
     }
+    const removeSubEntries = (element)=>{
+        for(let i = element.childNodes.length; i > 2; i--){
+            element.childNodes[i-1].remove();
+        }
+    }
     const updateProjects = ()=>{
         const projectTab = getElement('#projects-side');
-        projectTab.childNodes.forEach((node, index) => {
-            if(index > 1){
-                node.remove();
-            }
-        })
+        removeSubEntries(projectTab);
         projectFunctions.getAllProjects().forEach((proj, index)=> projectTab.appendChild(
             makeNewElement('div', `project-${index}`, 'project-side-label', proj.getTitle())))
+    }
+    const expandToggle =()=>{
+
     }
 
     return {makeNewElement, removeElement, toggleActive, getElement, getElements, setupNewProject, updateProjects}

@@ -3,6 +3,7 @@ import { projectFunctions } from "./index.js";
 
 const EventHandler = (()=>{
     const activateAddButton = ()=>{
+        DOMManip.getElement("#add-project-button").removeEventListener('click', DOMManip.cancelNewProject);
         DOMManip.getElement("#add-project-button").addEventListener('click', DOMManip.setupNewProject);
     }
 
@@ -13,6 +14,7 @@ const EventHandler = (()=>{
 
     const addProjectSubmission = ()=>{
         DOMManip.getElement("#add-project-button").removeEventListener('click', DOMManip.setupNewProject);
+        DOMManip.getElement("#add-project-button").addEventListener('click', DOMManip.cancelNewProject);
         DOMManip.getElement('#new-proj-add-button').addEventListener('click', projectFunctions.addProject);
     }
     return{activateAddButton, initStartingListeners, addProjectSubmission}

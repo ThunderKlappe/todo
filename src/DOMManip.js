@@ -48,6 +48,14 @@ const DOMManip = (()=>{
 
         EventHandler.addProjectSubmission();
     }
+    const cancelNewProject = ()=>{
+        _toggleActive('#add-project-button');
+        _toggleActive('#add-project-button-text');
+        _removeElement("#new-proj-input-container");
+        EventHandler.activateAddButton();
+
+    }
+
     const getNewProjTitle = ()=>{
         return DOMManip.getElement('#new-proj-input').value;
     }
@@ -87,8 +95,8 @@ const DOMManip = (()=>{
 
     }
 
-    return {getElement, getElements, fixStartingAnimations, setupNewProject, getNewProjTitle, 
-            addProjectToList, expandToggle}
+    return {getElement, getElements, fixStartingAnimations, setupNewProject, cancelNewProject,
+         getNewProjTitle, addProjectToList, expandToggle}
 })();
 
 export default DOMManip;

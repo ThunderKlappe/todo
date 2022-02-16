@@ -42,6 +42,11 @@ body{
     padding-left: 20px;
     padding-bottom: 8px;
 }
+.project-side-label{
+    font-size: 18px;
+    padding-left: 30px;
+    padding-bottom: 8px;
+}
 #main-display{
     flex: 4;
 }

@@ -1,3 +1,4 @@
+import { projectFunctions } from ".";
 import EventHandler from "./EventHandler";
 
 const DOMManip = (()=>{
@@ -40,8 +41,18 @@ const DOMManip = (()=>{
 
         EventHandler.addProjectSubmission();
     }
+    const updateProjects = ()=>{
+        const projectTab = getElement('#projects-side');
+        projectTab.childNodes.forEach((node, index) => {
+            if(index > 1){
+                node.remove();
+            }
+        })
+        projectFunctions.getAllProjects().forEach((proj, index)=> projectTab.appendChild(
+            makeNewElement('div', `project-${index}`, 'project-side-label', proj.getTitle())))
+    }
 
-    return {makeNewElement, removeElement, toggleActive, getElement, getElements, setupNewProject}
+    return {makeNewElement, removeElement, toggleActive, getElement, getElements, setupNewProject, updateProjects}
 })();
 
 export default DOMManip;

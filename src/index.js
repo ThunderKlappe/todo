@@ -23,10 +23,14 @@ const projectFunctions = (()=>{
         EventHandler.activateAddButton();
         DOMManip.toggleActive('#add-project-button');
         DOMManip.toggleActive('#add-project-button-text');
-        
+        DOMManip.updateProjects();
     }
 
-    return{addProject, _allProjects}
+    const getAllProjects = ()=>{
+        return _allProjects.map(ele=>ele);
+    }
+
+    return{addProject, getAllProjects}
 
 })();
 

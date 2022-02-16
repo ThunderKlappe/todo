@@ -4,10 +4,10 @@ export class Project{
         this.tasks = [];
         this.completed = false;
     }
-    // get title(){return this.title;}
-    // get tasks(){return this.tasks;}
-    // get completed(){return this.completed;}
-    // set title(newTitle);
-    // addTask(newTask){this.tasks.push(newTask);}
-    // markComplete(){this.completed = true;}
+    getTitle(){return this.title;}
+    getTasks(){return this.tasks;}
+    isCompleted(){return this.completed;}
+    setTitle(newTitle){this.title = newTitle;}
+    addTask(newTask){this.tasks.push(newTask);}
+    markComplete(){this.completed = true;}
 }

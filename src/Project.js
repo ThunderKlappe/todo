@@ -1,17 +1,13 @@
-const Project = (title)=>{
-    this._title = title;
-    this._tasks = [];
-    this._completed = false;
-
-    const getTitle = ()=>{this._title;}
-    const getTasks = () =>{this._tasks};
-    const isComplete = () =>{this._completed};
-    const setTitle = (newTitle)=>{this._title = newTitle;}
-    const addTask = (newTask) =>{this._tasks.push(newTask);}
-    const markComplete = () =>{this._completed = true;}
-    
-
-    return{ getTitle, getTasks, isComplete, setTitle, addTask, markComplete }
+export class Project{
+        constructor(initTitle){
+        this.title = initTitle;
+        this.tasks = [];
+        this.completed = false;
+    }
+    // get title(){return this.title;}
+    // get tasks(){return this.tasks;}
+    // get completed(){return this.completed;}
+    // set title(newTitle);
+    // addTask(newTask){this.tasks.push(newTask);}
+    // markComplete(){this.completed = true;}
 }
-
-export default Project;

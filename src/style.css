@@ -21,7 +21,7 @@ body{
     position: fixed;
     top: 0;
     width: 100%;
-    z-index: 1;
+    z-index: 2;
 }
 
 #content{
@@ -46,35 +46,44 @@ body{
     flex: 4;
 }
 
+.add-button{
+    border-radius: 100px;
+    background-color: #C8E3D4;
+    border: 3px solid #2f6363;
+    color: #2f6363;
+    text-align: center;
+    padding: 0px 10px;
+    margin: 0px 8px 1px;
+    box-shadow: 2px 2px black;
+    z-index: 1;
+}
+
 #add-project-button-container{
     position: fixed;
     top: 100px;
     right: 60px;
     display: flex;
+    flex-direction: column;
+    align-items: flex-end;
 }
 #add-project-button{
     height: 50px;
     width: 50px;
-    border-radius: 100px;
-    background-color: #C8E3D4;
-    border: 3px solid #2f6363;
-    color: #2f6363;
     font-size: 40px;
     font-weight: bold;
-    text-align: center;
-    padding: 0px 10px;
     
 }
 #add-project-button.hoverable{
     transition: .25s;
 }
-#add-project-button:hover{
+#add-project-button:hover, #add-project-button.active{
     display: flex;
     justify-content: center;
     align-items: center;
     width: 120px;
     background-color: #87AAAA;
 }
+
 #add-project-button span{
     font-size: 20px;
     opacity: 0;
@@ -82,7 +91,55 @@ body{
 #add-project-button span.hoverable{
     transition: .05s;
 }
-#add-project-button:hover span{
+#add-project-button:hover span, #add-project-button span.active{
     opacity: 1;
     transition: 1ms;
+}
+#new-proj-input-container{
+    padding: 8px 15px;
+    background-color: #C8E3D4;
+    border: 3px solid #2f6363;
+    border-radius: 100px;
+    box-shadow: 2px 2px black;
+    z-index: 1;
+}
+#new-proj-add-button{
+    font-size: 18px;
+    font-weight: bold;
+    padding-top: 4px;
+    padding-bottom: 4px;
+}
+
+/* Scroll Bar */
+::-webkit-scrollbar {
+    width: 20px;
+    padding-top: 2px;
+}
+    
+::-webkit-scrollbar-track {
+    border: 3px solid #87AAAA;
+    border-radius: 10px;
+}
+    
+::-webkit-scrollbar-thumb {
+    background:#2f6363; 
+    border-radius: 10px;
+    border: 2px solid #2f6363
+}
+    
+::-webkit-scrollbar-thumb:hover {
+    background:#265252; 
+}
+@-moz-document url-prefix() {
+    body{
+        scrollbar-color: #2f6363 #265252 #87AAAA;
+    }
+}
+input[type="text" i] {
+    background-color: #87AAAA;
+    color: #2f6363;
+    border-style: none;
+    border-bottom: 1px solid #2f6363;
+    flex-grow: 1;
+    font-size: 14px;
 }

@@ -8,7 +8,7 @@ const EventHandler = (()=>{
 
     const initStartingListeners = ()=>{
         activateAddButton();
-        DOMManip.getElements('.dropdown-toggle').addEventListener('click', expandToggle);
+        DOMManip.getElements('.dropdown-toggle').forEach(ele =>ele.addEventListener('click', DOMManip.expandToggle));
     }
 
     const addProjectSubmission = ()=>{

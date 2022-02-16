@@ -37,16 +37,31 @@ body{
     padding-top: 20px;
     border-top-right-radius: 30px;
 }
+.side-header-container{
+    display: flex;
+    flex-direction: column;
+}
 .side-header{
     font-size: 24px;
     padding-left: 20px;
     padding-bottom: 8px;
+    display: flex;
 }
 .project-side-label{
     font-size: 18px;
     padding-left: 30px;
     padding-bottom: 8px;
 }
+.dropdown-toggle{
+    margin-left: 8px;
+}
+.dropdown-toggle.anim{
+    transition: .25s;
+}
+.dropdown-toggle.closed{
+    transform: rotateZ(-90deg);
+}
+
 #main-display{
     flex: 4;
 }
@@ -78,7 +93,7 @@ body{
     font-weight: bold;
     
 }
-#add-project-button.hoverable{
+#add-project-button.anim{
     transition: .25s;
 }
 #add-project-button:hover, #add-project-button.active{
@@ -91,12 +106,14 @@ body{
 
 #add-project-button span{
     font-size: 0%;
+    opacity: 0;
 }
-#add-project-button span.hoverable{
+#add-project-button span.anim{
     transition: .05s;
 }
 #add-project-button:hover span, #add-project-button span.active{
     font-size: 20px;
+    opacity: 1;
 }
 #new-proj-input-container{
     padding: 8px 15px;

@@ -23,7 +23,7 @@ const projectFunctions = (()=>{
 })();
 
 const initWebsite = (()=>{
-    setTimeout(()=> DOMManip.fixStartingAnimations, 1);
+    setTimeout(DOMManip.fixStartingAnimations, 1);
     EventHandler.initStartingListeners();
 })();
 

@@ -6,10 +6,10 @@ const DOMManip = (()=>{
     const getElements = (selector)=>document.querySelectorAll(selector)
 
     const fixStartingAnimations = ()=>{
-        const hoverable = getElements(".make-hoverable")
-        hoverable.forEach(ele => {
-            ele.classList.add('hoverable');
-            ele.classList.remove('make-hoverable')})
+        const animatable = getElements(".fix-anim")
+        animatable.forEach(ele => {
+            ele.classList.add('anim');
+            ele.classList.remove('fix-anim')})
     }
     
     const _makeNewElement = (type, id='', HTMLClass = '', text = '') =>{
@@ -57,10 +57,9 @@ const DOMManip = (()=>{
             element.childNodes[i-1].remove();
         }
     }
-    const _updateProjects = ()=>{
-        const projectTab = getElement('#projects-side');
-        _removeSubEntries(projectTab);
-        projectFunctions.getAllProjects().forEach((proj, index)=> projectTab.appendChild(
+    const _revealArray = (parent, array)=>{
+        _removeSubEntries(parent);
+        array.forEach((proj, index)=> parent.appendChild(
             _makeNewElement('div', `project-${index}`, 'project-side-label', proj.getTitle())))
     }
 
@@ -69,10 +68,22 @@ const DOMManip = (()=>{
         EventHandler.activateAddButton();
         _toggleActive('#add-project-button');
         _toggleActive('#add-project-button-text');
-        _updateProjects();
+        _revealArray(getElement('#projects-side').parentElement, projectFunctions.getAllProjects());
     }
 
     const expandToggle = (e)=>{
+        let array = [];
+        if(e.target.parentElement.id == 'projects-side')
+        {
+            array = projectFunctions.getAllProjects();
+        }
+        if(e.target.classList.contains('closed')){
+            e.target.classList.remove('closed')
+            _revealArray(e.target.parentElement.parentElement, array);
+        }else{
+            e.target.classList.add('closed');
+            _removeSubEntries(e.target.parentElement.parentElement)
+        }
 
     }
 

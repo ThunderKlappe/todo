@@ -22,8 +22,11 @@ const EventHandler = (()=>{
         DOMManip.getElements('.project-side-label').forEach(ele=>ele.addEventListener('click', DOMManip.showProject));
 
     }
+    const activateAddTaskButton = ()=>{
+        DOMManip.getElement('#add-task-button').addEventListener('click', projectFunctions.addTask);
+    }
 
-    return{activateAddButton, initStartingListeners, addProjectSubmission, activateProjects}
+    return{activateAddButton, initStartingListeners, addProjectSubmission, activateProjects, activateAddTaskButton}
 })();
 
 

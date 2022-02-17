@@ -73,8 +73,15 @@ body{
     text-align: center;
     padding: 0px 10px;
     margin: 0px 8px 1px;
-    box-shadow: 2px 2px black;
-    z-index: 1;
+    
+}
+
+.add-button:hover{
+    background-color: #87AAAA;
+}
+.add-button:active{
+
+    box-shadow: inset 0px 0px 5px black;
 }
 
 #add-project-button-container{
@@ -84,12 +91,14 @@ body{
     display: flex;
     flex-direction: column;
     align-items: flex-end;
+    z-index: 1;
 }
 #add-project-button{
     height: 50px;
     width: 50px;
     font-size: 40px;
     font-weight: bold;
+    z-index: 1;
     
 }
 #add-project-button.anim{
@@ -114,13 +123,12 @@ body{
     font-size: 20px;
     opacity: 1;
 }
-#new-proj-input-container{
+.input-container{
     padding: 8px 15px;
     background-color: #C8E3D4;
     border: 3px solid #2f6363;
     border-radius: 100px;
     box-shadow: 2px 2px black;
-    z-index: 1;
 }
 #new-proj-add-button{
     font-size: 18px;
@@ -129,15 +137,20 @@ body{
     padding-bottom: 4px;
 }
 
-input[type="text" i] {
+input, select{
     background-color: #87AAAA;
     color: #2f6363;
     border-style: none;
     border-bottom: 1px solid #2f6363;
     flex-grow: 1;
     font-size: 14px;
+    height: 22px;
+    padding: 4px 6px 4px 8px;
 }
-
+select{
+    height: 31px;
+    font-size:18px
+}
 .project-container{
     display: flex;
     flex-direction: column;
@@ -151,7 +164,21 @@ input[type="text" i] {
     overflow-y: auto;
     white-space: nowrap;
     text-decoration: underline;
+    margin-bottom: 30px;
 }
+
+#add-task-container
+
+#add-task-button{
+    font-size: 20px;
+    padding: 5px 12px;
+}
+
+.add-task-info{
+    border-radius: 20px;
+    margin: 5px;
+}
+
 
 
 /* Scroll Bar */

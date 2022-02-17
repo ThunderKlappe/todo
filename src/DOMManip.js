@@ -38,9 +38,8 @@ const DOMManip = (()=>{
     const setupNewProject = ()=>{
         _toggleActive('#add-project-button');
         _toggleActive('#add-project-button-text');
-        const newProjInputContainer = _makeNewElement('div', 'new-proj-input-container');
-        const newProjInput = _makeNewElement('input', 'new-proj-input', '','',
-            {type:'text'}, {value:'Project Title'} );
+        const newProjInputContainer = _makeNewElement('div', 'new-proj-input-container', 'input-container');
+        const newProjInput = _makeNewElement('input', 'new-proj-input', '','',{type:'text'}, {value:'Project Title'} );
         const newProjAddButton = _makeNewElement('button', 'new-proj-add-button', 'add-button', 'Submit');
 
         newProjInputContainer.appendChild(newProjInput);
@@ -106,8 +105,32 @@ const DOMManip = (()=>{
         }
         const projectContainer = _makeNewElement('div', `project-${e.target.id.charAt(e.target.id.length-1)}-container`, 'project-container');
         const projectTitle = _makeNewElement('div', `project-${e.target.dataset.index}-title`, 'project-title', `${projectFunctions.getAllProjects()[e.target.dataset.index].getTitle()}`)
+        const addTaskContainer = _makeNewElement('div', 'add-task-container', 'input-container');
+        const addTaskName = _makeNewElement('input', 'add-task-name-input', 'add-task-info','',{type:'text'}, {value:'Task Name'});
+        const addTaskDescription = _makeNewElement('input', 'add-task-description-input', 'add-task-info','',{type:'text'}, {value:'Task Description'});
+        const addTaskDate = _makeNewElement('input', 'add-task-date-input', 'add-task-info','Due Date',{type:'date'});
+        const addTaskPriority = _makeNewElement('select', 'add-task-priority-input', 'add-task-info','');
+        const addTaskPriorityDefault = _makeNewElement('option','','','Priority', {value:0});
+        const addTaskPriorityLow = _makeNewElement('option','','','Low', {value:1});
+        const addTaskPriorityMedium = _makeNewElement('option','','','Medium', {value:2});
+        const addTaskPriorityHigh = _makeNewElement('option','','','High', {value:3});
+        const addTaskButton = _makeNewElement('button', 'add-task-button', 'add-button', 'Add New Task');
+
+        addTaskPriority.appendChild(addTaskPriorityDefault);
+        addTaskPriority.appendChild(addTaskPriorityLow);
+        addTaskPriority.appendChild(addTaskPriorityMedium);
+        addTaskPriority.appendChild(addTaskPriorityHigh);
+
+        addTaskContainer.appendChild(addTaskName);
+        addTaskContainer.appendChild(addTaskDescription);
+        addTaskContainer.appendChild(addTaskDate);
+        addTaskContainer.appendChild(addTaskPriority);
+        addTaskContainer.appendChild(addTaskButton);
+
         projectContainer.appendChild(projectTitle);
+        projectContainer.appendChild(addTaskContainer);
         mainDisplay.appendChild(projectContainer);
+        EventHandler.activateAddTaskButton();
     }
 
     return {getElement, getElements, fixStartingAnimations, setupNewProject, cancelNewProject,

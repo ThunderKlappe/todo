@@ -30,11 +30,17 @@ const DOMManip = (()=>{
     const _removeElement = (elementID) =>{
         getElement(elementID).remove();
     }
-    const _displayErrors = input=>{
-        const mainDisplay = getElement('#main-display');
+    const _displayErrors = (input, type)=>{
         input.forEach(ele=>{
             const error = _makeNewElement('div','','error-message', ele)
-            mainDisplay.firstElementChild.insertBefore(error, mainDisplay.firstElementChild.lastElementChild);
+            let parent;
+            if(type == "project"){
+                parent = getElement('#add-project-button-container-container');
+
+            }else if(type == 'task'){
+                parent = getElement('#main-display');
+            }
+            parent.firstElementChild.insertBefore(error, parent.firstElementChild.lastElementChild);
             setTimeout(()=>error.style.opacity = 0, 2000);
             setTimeout(()=>error.remove(), 4000);
         })
@@ -66,10 +72,25 @@ const DOMManip = (()=>{
 
     }
 
-    const getNewProjTitle = ()=>{
-        return DOMManip.getElement('#new-proj-input').value;
+    const getNewProjInfo = ()=>{
+        return {title:DOMManip.getElement('#new-proj-input').value};
     }
     
+    const checkNewProject = (project)=>{
+        let errorMessages = [];
+        if(project.title == ''){
+            errorMessages.push('Please enter a title for the project');
+        }
+        if(errorMessages.length > 0){
+            _displayErrors(errorMessages, 'project');
+            return false;
+        }else{
+            return true;
+        }
+
+    }
+
+
     const _removeSubEntries = (element)=>{
         for(let i = element.childNodes.length; i > 2; i--){
             element.childNodes[i-1].remove();
@@ -186,7 +207,7 @@ const DOMManip = (()=>{
         }
 
         if(errorMessages.length > 0){
-            _displayErrors(errorMessages);
+            _displayErrors(errorMessages, 'task');
             return false;
         }else{
             return true;
@@ -216,8 +237,8 @@ const DOMManip = (()=>{
         _displayTaskInput();        
     }
 
-    return {getElement, getElements, fixStartingAnimations, setupNewProject, cancelNewProject,
-         getNewProjTitle, addProjectToList, expandToggle, showProject, getNewTaskInfo, checkNewTask, 
+    return {getElement, getElements, fixStartingAnimations,checkNewProject, setupNewProject, cancelNewProject,
+         getNewProjInfo, addProjectToList, expandToggle, showProject, getNewTaskInfo, checkNewTask, 
          addTaskToList}
 })();
 

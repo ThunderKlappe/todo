@@ -9,9 +9,12 @@ const projectFunctions = (()=>{
     const _allProjects = [];
 
     const addProject = ()=>{
-        const newProjTitle = DOMManip.getNewProjTitle();
-        _allProjects.push(new Project(newProjTitle));
-        DOMManip.addProjectToList();
+        const newProjectInfo = DOMManip.getNewProjInfo();
+        const goodTask = DOMManip.checkNewProject(newProjectInfo);
+        if(goodTask){
+            _allProjects.push(new Project(newProjectInfo.title));
+            DOMManip.addProjectToList();
+        }
     }
     const addTask = ()=>{
         const newTaskInfo = DOMManip.getNewTaskInfo();

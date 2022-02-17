@@ -49,8 +49,7 @@ body{
 }
 .project-side-label{
     font-size: 18px;
-    padding-left: 30px;
-    padding-bottom: 8px;
+    padding: 0px 30px 8px 30px;
 }
 .dropdown-toggle{
     margin-left: 8px;
@@ -130,6 +129,31 @@ body{
     padding-bottom: 4px;
 }
 
+input[type="text" i] {
+    background-color: #87AAAA;
+    color: #2f6363;
+    border-style: none;
+    border-bottom: 1px solid #2f6363;
+    flex-grow: 1;
+    font-size: 14px;
+}
+
+.project-container{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 30px;
+}
+.project-title{
+    font-size: 36px;
+    font-weight: bold;
+    max-width: 40%;
+    overflow-y: auto;
+    white-space: nowrap;
+    text-decoration: underline;
+}
+
+
 /* Scroll Bar */
 ::-webkit-scrollbar {
     width: 20px;
@@ -155,11 +179,4 @@ body{
         scrollbar-color: #2f6363 #265252 #87AAAA;
     }
 }
-input[type="text" i] {
-    background-color: #87AAAA;
-    color: #2f6363;
-    border-style: none;
-    border-bottom: 1px solid #2f6363;
-    flex-grow: 1;
-    font-size: 14px;
-}
+

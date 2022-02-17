@@ -17,7 +17,13 @@ const EventHandler = (()=>{
         DOMManip.getElement("#add-project-button").addEventListener('click', DOMManip.cancelNewProject);
         DOMManip.getElement('#new-proj-add-button').addEventListener('click', projectFunctions.addProject);
     }
-    return{activateAddButton, initStartingListeners, addProjectSubmission}
+
+    const activateProjects = ()=>{
+        DOMManip.getElements('.project-side-label').forEach(ele=>ele.addEventListener('click', DOMManip.showProject));
+
+    }
+
+    return{activateAddButton, initStartingListeners, addProjectSubmission, activateProjects}
 })();
 
 

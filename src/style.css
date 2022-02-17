@@ -167,16 +167,38 @@ select{
     margin-bottom: 30px;
 }
 
-#add-task-container
-
 #add-task-button{
-    font-size: 20px;
+    font-size: 18px;
     padding: 5px 12px;
 }
 
 .add-task-info{
     border-radius: 20px;
     margin: 5px;
+}
+.tasks-container{
+    display: flex;
+    flex-direction: column;
+    margin-left: 60px;
+    width: -webkit-fill-available;
+}
+.task-container{
+    display: flex;
+    gap: 20px;
+}
+
+input[type="checkbox" i] {
+    flex-grow: 0;
+    height: 15px;
+    width: 15px;
+}
+
+.error-message{
+    font-size: 18px;
+    color: #993c3c;
+    transition: 2s;
+    transition-delay: 1s;
+    opacity: 1;
 }
 
 

@@ -13,12 +13,21 @@ const projectFunctions = (()=>{
         _allProjects.push(new Project(newProjTitle));
         DOMManip.addProjectToList();
     }
+    const addTask = ()=>{
+        const newTaskInfo = DOMManip.getNewTaskInfo();
+        const goodTask = DOMManip.checkNewTask(newTaskInfo);
+        if(goodTask){
+            _allProjects[newTaskInfo.project].tasks.push(new Task(newTaskInfo.name, newTaskInfo.description, 
+                newTaskInfo.date, newTaskInfo.priority, '', newTaskInfo.project));
+            DOMManip.addTaskToList();
+        }
+    }
 
     const getAllProjects = ()=>{
         return _allProjects.map(ele=>ele);
     }
 
-    return{addProject, getAllProjects}
+    return{addProject, addTask, getAllProjects}
 
 })();
 

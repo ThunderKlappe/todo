@@ -93,7 +93,7 @@ const DOMManip = (()=>{
     const _revealArray = (parent, array, type)=>{
         _removeSubEntries(parent);
         array.forEach((proj, index)=> parent.appendChild(
-            _makeNewElement('div', `${type}-${index}`, `${type}-side-label`, proj.getTitle(), {'data-index': `${index}`})))
+            _makeNewElement('div', `${type}-${index}`, `${type}-side-label ${(type=='project' && proj.isSelected())?'selected' : ''}`, proj.getTitle(), {'data-index': `${index}`}, )))
     }
 
     const addProjectToList = ()=>{
@@ -125,6 +125,8 @@ const DOMManip = (()=>{
 
     const _markSelectedProject = (e)=>{
         getElements(".project-side-label").forEach(ele=>ele.classList.remove('selected'));
+        projectFunctions.getAllProjects().forEach(proj => proj.markSelected(false));
+        projectFunctions.getAllProjects()[e.target.dataset.index].markSelected(true);
         e.target.classList.add('selected');
     }
 
@@ -156,30 +158,15 @@ const DOMManip = (()=>{
         
         EventHandler.activateAddTaskButton();
     }
-    const showProject = (e)=>{
-        _markSelectedProject(e);
-        const mainDisplay = getElement('#main-display');
+    
+    const _getProjectNumber = ()=>{
+        return getElement('.selected').dataset.index;
 
-        //this can get removed after Today's Tasks is working
-        if(mainDisplay.childNodes.length >0){
-            mainDisplay.firstChild.remove();
-        }
-        //*****
-
-        const projectContainer = _makeNewElement('div', `project-${e.target.id.charAt(e.target.id.length-1)}-container`, 'project-container');
-        const projectTitle = _makeNewElement('div', `project-${e.target.dataset.index}-title`, 'project-title', `${projectFunctions.getAllProjects()[e.target.dataset.index].getTitle()}`)
-        const tasksContainer = _makeNewElement('div', `project-${e.target.dataset.index}-tasks-container`, 'tasks-container');
-        const tasksWrapper = _makeNewElement('div', `project-${e.target.dataset.index}-tasks-wrapper`, 'tasks-wrapper')
-        projectContainer.appendChild(projectTitle);
-        tasksWrapper.appendChild(tasksContainer)
-        projectContainer.appendChild(tasksWrapper);
-        mainDisplay.appendChild(projectContainer);
-        _displayTaskInput();
     }
 
     const getTaskInfo = (index)=>{
         let formInfo;
-        const projectNumber = getElement('.selected').dataset.index;
+        const projectNumber = _getProjectNumber();
         if(index == undefined){
             formInfo = getElements('.add-task-info');
         }else{
@@ -217,18 +204,19 @@ const DOMManip = (()=>{
 
     }
 
-    const addTaskToList = ()=>{
-        const tasksContainer = getElement('.tasks-container');
-        const projectNumber = getElement('.selected').dataset.index;
-        const taskNumber = projectFunctions.getAllProjects()[projectNumber].tasks.length-1;
-        const newTask = projectFunctions.getAllProjects()[projectNumber].tasks[taskNumber];
+    const _insertAfter = (newNode, existingNode)=> {
+        existingNode.parentNode.insertBefore(newNode, existingNode.nextSibling);
+    }
 
-        getElement('#add-task-container').remove();
-        const newTaskContainer = _makeNewElement('div', `project-${projectNumber}-task-${taskNumber}-container`, 'task-container', '', {'data-priority':newTask.getPriority()},{"data-task":taskNumber});
+    const _fillInTask = (task, taskNumber)=>{
+        const projectNumber = _getProjectNumber();
+        const tasksContainer = getElement('.tasks-container');
+
+        const newTaskContainer = _makeNewElement('div', `project-${projectNumber}-task-${taskNumber}-container`, 'task-container', '', {'data-priority':task.getPriority()},{"data-task":taskNumber});
         const newTaskCheckbox = _makeNewElement('input', `project-${projectNumber}-task-${taskNumber}-checkbox`, 'task-checkbox', '', {type:'checkbox'}, {'data-project':projectNumber}, {'data-task':taskNumber});
-        const newTaskName = _makeNewElement('div', `project-${projectNumber}-task-${taskNumber}-name`, 'task-name task-info', newTask.getName());
-        const newTaskDescription = _makeNewElement('div', `project-${projectNumber}-task-${taskNumber}-description`, 'task-description task-info', newTask.getDescription());
-        const newTaskDate = _makeNewElement('div', `project-${projectNumber}-task-${taskNumber}-date`, 'task-date task-info', newTask.getDate());
+        const newTaskName = _makeNewElement('div', `project-${projectNumber}-task-${taskNumber}-name`, 'task-name task-info', task.getName());
+        const newTaskDescription = _makeNewElement('div', `project-${projectNumber}-task-${taskNumber}-description`, 'task-description task-info', task.getDescription());
+        const newTaskDate = _makeNewElement('div', `project-${projectNumber}-task-${taskNumber}-date`, 'task-date task-info', task.getDate());
         const newTaskEditButton = _makeNewElement('button', `project-${projectNumber}-task-${taskNumber}-edit-button`, 'task-button');
         const newTaskEditIcon = _makeNewElement('i', '', 'fa-solid fa-pencil edit-icon');
         const newTaskEditText =_makeNewElement('span', '', 'edit-text', 'Edit Task')
@@ -240,15 +228,35 @@ const DOMManip = (()=>{
         newTaskEditButton.appendChild(newTaskEditIcon);
         newTaskEditButton.appendChild(newTaskEditText);
         newTaskContainer.appendChild(newTaskEditButton);
-        tasksContainer.appendChild(newTaskContainer);
+        if(taskNumber == 0){
+            tasksContainer.appendChild(newTaskContainer);
+        }else{
+            _insertAfter(newTaskContainer, tasksContainer.childNodes[taskNumber-1]);
+        }
         EventHandler.activateEditButton(newTaskEditButton);
+    }
 
+    const updateTaskList = (taskNumber)=>{
+        const projectNumber = _getProjectNumber();
+        const editTaskContainer = getElement(`#project-${projectNumber}-task-${taskNumber}-container`)
+        const updatedTask = projectFunctions.getAllProjects()[projectNumber].tasks[taskNumber];
+        editTaskContainer.remove()
+        _fillInTask(updatedTask, taskNumber)
+    }
+
+    const addTaskToList = ()=>{
+        const projectNumber = _getProjectNumber();
+        const taskNumber = projectFunctions.getAllProjects()[projectNumber].tasks.length-1;
+        const newTask = projectFunctions.getAllProjects()[projectNumber].tasks[taskNumber];
+
+        getElement('#add-task-container').remove();
+        _fillInTask(newTask, taskNumber);
         _displayTaskInput();
     }
 
     const displayEditTask = e=>{
         const editButton = e.currentTarget;
-        const projectNumber = getElement('.selected').dataset.index;
+        const projectNumber = _getProjectNumber()
         const taskNumber = editButton.parentElement.dataset.task;
         const editTask = projectFunctions.getAllProjects()[projectNumber].tasks[taskNumber];
 
@@ -295,30 +303,28 @@ const DOMManip = (()=>{
 
     }
 
-    const updateTaskList = (taskNumber)=>{
-        const projectNumber = getElement('.selected').dataset.index;
-        const editTaskContainer = getElement(`#project-${projectNumber}-task-${taskNumber}-container`)
-        const editFields = getElements(`#project-${projectNumber}-task-${taskNumber}-container .edit-task-info`)
-        const updatedTask = projectFunctions.getAllProjects()[projectNumber].tasks[taskNumber];
-        const editButton = getElement(`#project-${projectNumber}-task-${taskNumber}-edit-button`);
-        editFields.forEach(ele=>ele.remove());
+    const showProject = (e)=>{
+        _markSelectedProject(e);
+        const mainDisplay = getElement('#main-display');
 
-        const updatedTaskName = _makeNewElement('div', `project-${projectNumber}-task-${taskNumber}-name`, 'task-name task-info', updatedTask.getName());
-        const updatedTaskDescription = _makeNewElement('div', `project-${projectNumber}-task-${taskNumber}-description`, 'task-description task-info', updatedTask.getDescription());
-        const updatedTaskDate = _makeNewElement('div', `project-${projectNumber}-task-${taskNumber}-date`, 'task-date task-info', updatedTask.getDate());
+        //this can get removed after Today's Tasks is working
+        if(mainDisplay.childNodes.length >0){
+            mainDisplay.firstChild.remove();
+        }
+        //*****
 
-        editTaskContainer.lastElementChild.remove();
-        editTaskContainer.insertBefore(updatedTaskName, editTaskContainer.lastElementChild);
-        editTaskContainer.insertBefore(updatedTaskDescription, editTaskContainer.lastElementChild);
-        editTaskContainer.insertBefore(updatedTaskDate, editTaskContainer.lastElementChild);
-        
-        editTaskContainer.setAttribute('data-priority', updatedTask.getPriority())
+        const currentProject = projectFunctions.getAllProjects()[e.target.dataset.index];
 
-        editButton.firstElementChild.classList.remove('fa-check');
-        editButton.firstElementChild.classList.add('fa-pencil');
-        editButton.lastElementChild.textContent = "Edit Task";
-
-        EventHandler.activateEditButton(editButton);
+        const projectContainer = _makeNewElement('div', `project-${e.target.id.charAt(e.target.id.length-1)}-container`, 'project-container');
+        const projectTitle = _makeNewElement('div', `project-${e.target.dataset.index}-title`, 'project-title', `${currentProject.getTitle()}`)
+        const tasksContainer = _makeNewElement('div', `project-${e.target.dataset.index}-tasks-container`, 'tasks-container');
+        const tasksWrapper = _makeNewElement('div', `project-${e.target.dataset.index}-tasks-wrapper`, 'tasks-wrapper')
+        projectContainer.appendChild(projectTitle);
+        tasksWrapper.appendChild(tasksContainer)
+        projectContainer.appendChild(tasksWrapper);
+        mainDisplay.appendChild(projectContainer);
+        currentProject.tasks.forEach((task, index) => _fillInTask(task, index))
+        _displayTaskInput();
     }
 
     const cancelEdit = (e)=>{

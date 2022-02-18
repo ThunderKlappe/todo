@@ -49,7 +49,12 @@ body{
 }
 .project-side-label{
     font-size: 18px;
-    padding: 0px 30px 8px 30px;
+    margin: 4px 0px 4px 20px;
+    padding: 4px 0px 4px 10px;
+}
+.selected{
+    background-color: #265252;
+    border-radius: 30px 0 0 30px;
 }
 .dropdown-toggle{
     margin-left: 8px;

@@ -141,10 +141,10 @@ const DOMManip = (()=>{
         const addTaskDescription = _makeNewElement('input', 'add-task-description-input', 'add-task-info','',{type:'text'}, {value:'Task Description'});
         const addTaskDate = _makeNewElement('input', 'add-task-date-input', 'add-task-info','Due Date',{type:'date'});
         const addTaskPriority = _makeNewElement('select', 'add-task-priority-input', 'add-task-info','');
-        const addTaskPriorityDefault = _makeNewElement('option','','','Priority', {value:0});
-        const addTaskPriorityLow = _makeNewElement('option','','','Low', {value:1});
-        const addTaskPriorityMedium = _makeNewElement('option','','','Medium', {value:2});
-        const addTaskPriorityHigh = _makeNewElement('option','','','High', {value:3});
+        const addTaskPriorityDefault = _makeNewElement('option','','','Priority', {value:0} );
+        const addTaskPriorityLow = _makeNewElement('option','','','Low', {value:'Low'},{style:'background-color:#E1ADAD'});
+        const addTaskPriorityMedium = _makeNewElement('option','','','Medium', {value:"Medium"}, {style:'background-color:#EFEF38'});
+        const addTaskPriorityHigh = _makeNewElement('option','','','High', {value:"High"}, {style:'background-color:#9DCD8D'});
         const addTaskButton = _makeNewElement('button', 'add-task-button', 'add-button', 'Add New Task');
 
         addTaskPriority.appendChild(addTaskPriorityDefault);
@@ -175,8 +175,10 @@ const DOMManip = (()=>{
         const projectContainer = _makeNewElement('div', `project-${e.target.id.charAt(e.target.id.length-1)}-container`, 'project-container');
         const projectTitle = _makeNewElement('div', `project-${e.target.dataset.index}-title`, 'project-title', `${projectFunctions.getAllProjects()[e.target.dataset.index].getTitle()}`)
         const tasksContainer = _makeNewElement('div', `project-${e.target.dataset.index}-tasks-container`, 'tasks-container');
+        const tasksWrapper = _makeNewElement('div', `project-${e.target.dataset.index}-tasks-wrapper`, 'tasks-wrapper')
         projectContainer.appendChild(projectTitle);
-        projectContainer.appendChild(tasksContainer);
+        tasksWrapper.appendChild(tasksContainer)
+        projectContainer.appendChild(tasksWrapper);
         mainDisplay.appendChild(projectContainer);
         _displayTaskInput();
     }
@@ -186,7 +188,7 @@ const DOMManip = (()=>{
         return {name:formInfo[0].value,
                 description: formInfo[1].value,
                 date: formInfo[2].value,
-                priority: formInfo[3].value,
+                priority: getElement('#add-task-priority-input').value,
                 project: getElement('.selected').dataset.index}
         
     }
@@ -220,14 +222,14 @@ const DOMManip = (()=>{
         const projectNumber = getElement('.selected').dataset.index;
         const taskNumber = projectFunctions.getAllProjects()[projectNumber].tasks.length-1;
         const newTask = projectFunctions.getAllProjects()[projectNumber].tasks[taskNumber];
+        console.table(newTask);
 
         getElement('#add-task-container').remove();
-
-        const newTaskContainer = _makeNewElement('div', `project-${projectNumber}-task-${taskNumber}-container`, 'task-container');
+        const newTaskContainer = _makeNewElement('div', `project-${projectNumber}-task-${taskNumber}-container`, 'task-container', '', {'data-priority':newTask.getPriority()});
         const newTaskCheckbox = _makeNewElement('input', `project-${projectNumber}-task-${taskNumber}-checkbox`, 'task-checkbox', '', {type:'checkbox'}, {'data-project':projectNumber}, {'data-task':taskNumber});
-        const newTaskName = _makeNewElement('div', `project-${projectNumber}-task-${taskNumber}-name`, 'task-name', newTask.getName());
-        const newTaskDescription = _makeNewElement('div', `project-${projectNumber}-task-${taskNumber}-description`, 'task-description', newTask.getDescription());
-        const newTaskDate = _makeNewElement('div', `project-${projectNumber}-task-${taskNumber}-date`, 'task-date', newTask.getDate());
+        const newTaskName = _makeNewElement('div', `project-${projectNumber}-task-${taskNumber}-name`, 'task-name task-info', newTask.getName());
+        const newTaskDescription = _makeNewElement('div', `project-${projectNumber}-task-${taskNumber}-description`, 'task-description task-info', newTask.getDescription());
+        const newTaskDate = _makeNewElement('div', `project-${projectNumber}-task-${taskNumber}-date`, 'task-date task-info', newTask.getDate());
 
         newTaskContainer.appendChild(newTaskCheckbox);
         newTaskContainer.appendChild(newTaskName);

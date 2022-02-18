@@ -176,15 +176,25 @@ select{
     border-radius: 20px;
     margin: 5px;
 }
-.tasks-container{
+.tasks-wrapper{
     display: flex;
     flex-direction: column;
     margin-left: 60px;
+    margin-bottom: 40px;
     width: -webkit-fill-available;
 }
 .task-container{
+    border-radius: 10px;
+    padding: 4px 12px;
     display: flex;
     gap: 20px;
+    max-width: fit-content;
+    
+}
+.task-info{
+    max-width: 35%;
+    white-space: nowrap;
+    overflow-y: auto;
 }
 
 input[type="checkbox" i] {
@@ -201,11 +211,20 @@ input[type="checkbox" i] {
     opacity: 1;
 }
 
-
+[data-priority='Low']{
+    background-color: #E1ADAD;
+}
+[data-priority='Medium']{
+    background-color: #EFEF38;
+}
+[data-priority='High']{
+    background-color: #9DCD8D;
+}
 
 /* Scroll Bar */
 ::-webkit-scrollbar {
     width: 20px;
+    height: 10px;
     padding-top: 2px;
 }
     

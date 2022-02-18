@@ -11,10 +11,10 @@ const projectFunctions = (()=>{
 
     const addProject = (e)=>{
         const newProjectInfo = DOMManip.getNewProjInfo();
-        const goodTask = DOMManip.checkNewProject(e,newProjectInfo);
-        if(goodTask){
+        const goodProject = DOMManip.checkNewProject(e,newProjectInfo);
+        if(goodProject){
             _allProjects.push(new Project(newProjectInfo.title));
-            DOMManip.addProjectToList();
+            DOMManip.updateProjectList();
             dataStorage.saveData();
 
         }
@@ -29,7 +29,18 @@ const projectFunctions = (()=>{
             dataStorage.saveData();
         }
     }
-    const confirmEdit = (e)=>{
+    const confirmProjectEdit = (e)=>{
+        const editTitle = DOMManip.getElement('.title-edit').value;
+        const projectNumber = DOMManip.getElement('.title-edit').dataset.project;
+        const goodProject = DOMManip.checkNewProject(e,{title:editTitle});
+        if(goodProject){
+            _allProjects[projectNumber].setTitle(editTitle);
+            DOMManip.updateProjectList();
+            dataStorage.saveData();
+
+        }
+    }
+    const confirmTaskEdit = (e)=>{
         const editTask = e.currentTarget.parentElement.dataset.task;
         const editTaskInfo = DOMManip.getTaskInfo(editTask);
         const goodTask = DOMManip.checkNewTask(e, editTaskInfo);
@@ -48,7 +59,7 @@ const projectFunctions = (()=>{
         _allProjects = dataStorage.loadData();
     }
 
-    return{addProject, addTask, confirmEdit, getAllProjects, loadProjects}
+    return{addProject, addTask, confirmProjectEdit, confirmTaskEdit, getAllProjects, loadProjects}
 
 })();
 

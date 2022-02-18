@@ -28,6 +28,7 @@ body{
     margin-top: 72px;
     display: flex;
     width: -webkit-fill-available;
+    background-color: inherit;
 }
 #side-panel{
     flex: 1;
@@ -68,6 +69,7 @@ body{
 
 #main-display{
     flex: 4;
+    background-color: inherit;
 }
 
 .add-button{
@@ -151,9 +153,10 @@ input, select{
     border-style: none;
     border-bottom: 1px solid #2f6363;
     flex-grow: 1;
-    font-size: 14px;
+    font-size: 16px;
     height: 22px;
     padding: 4px 6px 4px 8px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 select{
     height: 31px;
@@ -164,15 +167,39 @@ select{
     flex-direction: column;
     align-items: center;
     margin-top: 30px;
+    background-color: inherit;
 }
+.project-title-wrapper{
+    max-width: 45%;
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    align-items: center;
+    background-color: inherit;
+    margin-bottom: 30px;
+}
+
 .project-title{
     font-size: 36px;
     font-weight: bold;
-    max-width: 40%;
     overflow-y: auto;
     white-space: nowrap;
     text-decoration: underline;
-    margin-bottom: 30px;
+    
+}
+.title-edit{
+    background-color: inherit;
+    font-size: 36px;
+    font-weight: bold;
+    margin-top: 6px;
+    padding: 6px 0px 10px ;
+    flex-grow: 0;
+    border-bottom-width: 0px;
+    border-radius: 30px;
+    text-align: center;
+    text-decoration: none;
+    filter: brightness(80%);
+    overflow-y: auto;
 }
 
 #add-task-button{
@@ -205,8 +232,6 @@ select{
     overflow-y: auto;
 }
 
-
-
 .error-message{
     font-size: 18px;
     color: #993c3c;
@@ -226,25 +251,29 @@ select{
     background-color: #9DCD8D;
 }
 
-.task-button{
+.edit-button{
     border-radius: 10px;
     background-color: inherit;
     filter: brightness(100%);
     border: 1px solid #2f6363;
     color: #2f6363;
     transition: .25s;
+    min-width: fit-content;
+    height: 20px;
+    white-space: nowrap;
+
 }
 
-.task-button:hover{
+.edit-button:hover{
     filter:brightness(70%);
 }
 
-.task-button span{
+.edit-button span{
     font-size: 0%;
     opacity: 0;
     transition: .25s;
 }
-.task-button:hover span{
+.edit-button:hover span{
     font-size: 14px;
     opacity: 1;
     padding: 0px 5px;

@@ -100,10 +100,35 @@ const DOMManip = (()=>{
         _revealArray(getElement('#projects-side').parentElement, projectFunctions.getAllProjects(), 'project');
     }
 
-    const addProjectToList = ()=>{
-        _removeElement("#new-proj-input-container");
-        _toggleActive('#add-project-button');
-        _toggleActive('#add-project-button-text');
+    const _displayTitle = ()=>{
+        const projectNumber = _getProjectNumber();
+        const currentProject = projectFunctions.getAllProjects()[projectNumber];
+        const titleWrapper = getElement('.project-title-wrapper');
+        
+        const projectTitle = _makeNewElement('div', `project-${projectNumber}-title`, 'project-title', `${currentProject.getTitle()}`);
+        const editTitleButton = _makeNewElement('button', `project-${projectNumber}-edit-button`, 'edit-button');
+        const editTitleIcon = _makeNewElement('i', '', 'fa-solid fa-pencil edit-icon');
+        const editTitleText =_makeNewElement('span', '', 'edit-text', 'Edit Title')
+        editTitleButton.appendChild(editTitleIcon);
+        editTitleButton.appendChild(editTitleText);
+        if(titleWrapper.childNodes.length >0){
+            titleWrapper.firstElementChild.remove();
+            titleWrapper.lastElementChild.remove();
+        }
+        titleWrapper.appendChild(projectTitle);
+        titleWrapper.appendChild(editTitleButton);
+    }
+    const updateProjectList = ()=>{
+        if(getElement('#new-proj-input-container')){
+            _removeElement("#new-proj-input-container");
+            _toggleActive('#add-project-button');
+            _toggleActive('#add-project-button-text');
+        }
+        if(getElement('.title-edit')){
+            _displayTitle()
+            EventHandler.activateEditProject();
+        }
+        
         displayProjects();
         EventHandler.activateAddButton();
         EventHandler.activateProjects();
@@ -221,7 +246,7 @@ const DOMManip = (()=>{
         const newTaskName = _makeNewElement('div', `project-${projectNumber}-task-${taskNumber}-name`, 'task-name task-info', task.getName());
         const newTaskDescription = _makeNewElement('div', `project-${projectNumber}-task-${taskNumber}-description`, 'task-description task-info', task.getDescription());
         const newTaskDate = _makeNewElement('div', `project-${projectNumber}-task-${taskNumber}-date`, 'task-date task-info', task.getDate());
-        const newTaskEditButton = _makeNewElement('button', `project-${projectNumber}-task-${taskNumber}-edit-button`, 'task-button');
+        const newTaskEditButton = _makeNewElement('button', `project-${projectNumber}-task-${taskNumber}-edit-button`, 'edit-button');
         const newTaskEditIcon = _makeNewElement('i', '', 'fa-solid fa-pencil edit-icon');
         const newTaskEditText =_makeNewElement('span', '', 'edit-text', 'Edit Task')
 
@@ -254,6 +279,22 @@ const DOMManip = (()=>{
         _displayTaskInput();
     }
 
+    const displayEditProject = (e)=>{
+        const projectNumber = _getProjectNumber();
+        const projecTitle = projectFunctions.getAllProjects()[projectNumber].getTitle();
+        const titleWrapper = getElement('.project-title-wrapper');
+        const editButton = e.currentTarget;
+
+        const projectTitleInput = _makeNewElement('input', `project-${projectNumber}-title-input`, 'title-edit', '', {type:'text'}, {value:projecTitle}, {'data-project':projectNumber});
+        titleWrapper.insertBefore(projectTitleInput, titleWrapper.lastElementChild);
+        titleWrapper.firstElementChild.remove();
+
+        editButton.firstElementChild.classList.remove('fa-pencil');
+        editButton.firstElementChild.classList.add('fa-check');
+        editButton.lastElementChild.textContent = "Confirm";
+        EventHandler.activateConfirmProjectEdit(editButton);
+    }
+
     const displayEditTask = e=>{
         const editButton = e.currentTarget;
         const projectNumber = _getProjectNumber()
@@ -281,7 +322,7 @@ const DOMManip = (()=>{
         editTaskPriority.appendChild(editTaskPriorityMedium);
         editTaskPriority.appendChild(editTaskPriorityHigh);
 
-        const editCancelButton = _makeNewElement('button', `project-${projectNumber}-task-${taskNumber}-edit-cancel-button`, 'task-button');
+        const editCancelButton = _makeNewElement('button', `project-${projectNumber}-task-${taskNumber}-edit-cancel-button`, 'edit-button');
         const editCancelIcon = _makeNewElement('i', '', 'fa-solid fa-xmark edit-cancel-icon');
         const editCancelText =_makeNewElement('span', '', 'edit-cancel-text', 'Cancel')
 
@@ -299,7 +340,7 @@ const DOMManip = (()=>{
         editButton.firstElementChild.classList.add('fa-check');
         editButton.lastElementChild.textContent = "Confirm";
 
-        EventHandler.activateConfirmEdit(editButton);
+        EventHandler.activateConfirmTaskEdit(editButton);
 
     }
 
@@ -313,20 +354,23 @@ const DOMManip = (()=>{
         }
         //*****
 
-        const currentProject = projectFunctions.getAllProjects()[e.target.dataset.index];
+        const projectNumber = _getProjectNumber();
+        const currentProject = projectFunctions.getAllProjects()[projectNumber];
 
-        const projectContainer = _makeNewElement('div', `project-${e.target.id.charAt(e.target.id.length-1)}-container`, 'project-container');
-        const projectTitle = _makeNewElement('div', `project-${e.target.dataset.index}-title`, 'project-title', `${currentProject.getTitle()}`)
-        const tasksContainer = _makeNewElement('div', `project-${e.target.dataset.index}-tasks-container`, 'tasks-container');
-        const tasksWrapper = _makeNewElement('div', `project-${e.target.dataset.index}-tasks-wrapper`, 'tasks-wrapper')
+        const projectContainer = _makeNewElement('div', `project-${projectNumber}-container`, 'project-container');
+        const projectTitleWrapper = _makeNewElement('div' , `project-${projectNumber}-title-wrapper`, 'project-title-wrapper');
+        const tasksContainer = _makeNewElement('div', `project-${projectNumber}-tasks-container`, 'tasks-container');
+        const tasksWrapper = _makeNewElement('div', `project-${projectNumber}-tasks-wrapper`, 'tasks-wrapper')
         const spacer = _makeNewElement('div');
-        projectContainer.appendChild(projectTitle);
+        projectContainer.appendChild(projectTitleWrapper);
         tasksContainer.appendChild(spacer);
         tasksWrapper.appendChild(tasksContainer)
         projectContainer.appendChild(tasksWrapper);
         mainDisplay.appendChild(projectContainer);
+        _displayTitle();
         currentProject.tasks.forEach((task, index) => _fillInTask(task, index))
         _displayTaskInput();
+        EventHandler.activateEditProject();
     }
 
     const cancelEdit = (e)=>{
@@ -335,8 +379,8 @@ const DOMManip = (()=>{
     }
 
     return {getElement, getElements, fixStartingAnimations,checkNewProject, setupNewProject, cancelNewProject,
-         getNewProjInfo, addProjectToList, expandToggle, showProject, getTaskInfo, checkNewTask, 
-         addTaskToList, displayEditTask, updateTaskList, cancelEdit, displayProjects}
+         getNewProjInfo, updateProjectList, expandToggle, showProject, getTaskInfo, checkNewTask, 
+         addTaskToList, displayEditProject, displayEditTask, updateTaskList, cancelEdit, displayProjects}
 })();
 
 export default DOMManip;

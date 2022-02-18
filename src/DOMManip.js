@@ -232,11 +232,7 @@ const DOMManip = (()=>{
         newTaskEditButton.appendChild(newTaskEditIcon);
         newTaskEditButton.appendChild(newTaskEditText);
         newTaskContainer.appendChild(newTaskEditButton);
-        if(taskNumber == 0){
-            tasksContainer.appendChild(newTaskContainer);
-        }else{
-            _insertAfter(newTaskContainer, tasksContainer.childNodes[taskNumber-1]);
-        }
+        _insertAfter(newTaskContainer, (taskNumber == 0)?tasksContainer.childNodes[taskNumber]:tasksContainer.childNodes[taskNumber-1]);
         EventHandler.activateEditButton(newTaskEditButton);
     }
 
@@ -323,7 +319,9 @@ const DOMManip = (()=>{
         const projectTitle = _makeNewElement('div', `project-${e.target.dataset.index}-title`, 'project-title', `${currentProject.getTitle()}`)
         const tasksContainer = _makeNewElement('div', `project-${e.target.dataset.index}-tasks-container`, 'tasks-container');
         const tasksWrapper = _makeNewElement('div', `project-${e.target.dataset.index}-tasks-wrapper`, 'tasks-wrapper')
+        const spacer = _makeNewElement('div');
         projectContainer.appendChild(projectTitle);
+        tasksContainer.appendChild(spacer);
         tasksWrapper.appendChild(tasksContainer)
         projectContainer.appendChild(tasksWrapper);
         mainDisplay.appendChild(projectContainer);
@@ -332,7 +330,8 @@ const DOMManip = (()=>{
     }
 
     const cancelEdit = (e)=>{
-
+        const task = e.currentTarget.parentElement.dataset.task;
+        updateTaskList(task);
     }
 
     return {getElement, getElements, fixStartingAnimations,checkNewProject, setupNewProject, cancelNewProject,

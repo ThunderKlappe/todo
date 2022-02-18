@@ -73,11 +73,12 @@ body{
     text-align: center;
     padding: 0px 10px;
     margin: 0px 8px 1px;
+    filter: brightness(100%);
     
 }
 
 .add-button:hover{
-    background-color: #87AAAA;
+    filter: brightness(70%);
 }
 .add-button:active{
 
@@ -109,7 +110,9 @@ body{
     justify-content: center;
     align-items: center;
     width: 120px;
-    background-color: #87AAAA;
+}
+#add-project-button.active{
+    filter: brightness(80%);
 }
 
 #add-project-button span{
@@ -209,6 +212,7 @@ input[type="checkbox" i] {
     transition: 2s;
     transition-delay: 1s;
     opacity: 1;
+    margin: 6px;
 }
 
 [data-priority='Low']{
@@ -220,6 +224,46 @@ input[type="checkbox" i] {
 [data-priority='High']{
     background-color: #9DCD8D;
 }
+
+.task-button{
+    border-radius: 10px;
+    background-color: inherit;
+    filter: brightness(100%);
+    border: 1px solid #2f6363;
+    color: #2f6363;
+    transition: .25s;
+}
+
+.task-button:hover{
+    filter:brightness(70%);
+}
+
+.task-button span{
+    font-size: 0%;
+    opacity: 0;
+    transition: .25s;
+}
+.task-button:hover span{
+    font-size: 14px;
+    opacity: 1;
+    padding: 0px 5px;
+}
+
+.task-container input, .task-container select{
+    background-color: inherit;
+    color: #2f6363;
+    border-style: none;
+    border-bottom: 1px solid #2f6363;
+    flex-grow: 1;
+    font-size: 14px;
+    height: 18px;
+    padding: 2px 4px 2px 4px;
+}
+.task-container select{
+    height: 23px;
+    font-size:15px
+}
+
 
 /* Scroll Bar */
 ::-webkit-scrollbar {

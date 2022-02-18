@@ -222,26 +222,86 @@ const DOMManip = (()=>{
         const projectNumber = getElement('.selected').dataset.index;
         const taskNumber = projectFunctions.getAllProjects()[projectNumber].tasks.length-1;
         const newTask = projectFunctions.getAllProjects()[projectNumber].tasks[taskNumber];
-        console.table(newTask);
 
         getElement('#add-task-container').remove();
-        const newTaskContainer = _makeNewElement('div', `project-${projectNumber}-task-${taskNumber}-container`, 'task-container', '', {'data-priority':newTask.getPriority()});
+        const newTaskContainer = _makeNewElement('div', `project-${projectNumber}-task-${taskNumber}-container`, 'task-container', '', {'data-priority':newTask.getPriority()},{"data-task":taskNumber});
         const newTaskCheckbox = _makeNewElement('input', `project-${projectNumber}-task-${taskNumber}-checkbox`, 'task-checkbox', '', {type:'checkbox'}, {'data-project':projectNumber}, {'data-task':taskNumber});
         const newTaskName = _makeNewElement('div', `project-${projectNumber}-task-${taskNumber}-name`, 'task-name task-info', newTask.getName());
         const newTaskDescription = _makeNewElement('div', `project-${projectNumber}-task-${taskNumber}-description`, 'task-description task-info', newTask.getDescription());
         const newTaskDate = _makeNewElement('div', `project-${projectNumber}-task-${taskNumber}-date`, 'task-date task-info', newTask.getDate());
+        const newTaskEditButton = _makeNewElement('button', `project-${projectNumber}-task-${taskNumber}-edit-button`, 'task-button');
+        const newTaskEditIcon = _makeNewElement('i', '', 'fa-solid fa-pencil edit-icon');
+        const newTaskEditText =_makeNewElement('span', '', 'edit-text', 'Edit Task')
 
         newTaskContainer.appendChild(newTaskCheckbox);
         newTaskContainer.appendChild(newTaskName);
         newTaskContainer.appendChild(newTaskDescription);
         newTaskContainer.appendChild(newTaskDate);
+        newTaskEditButton.appendChild(newTaskEditIcon);
+        newTaskEditButton.appendChild(newTaskEditText);
+        newTaskContainer.appendChild(newTaskEditButton);
         tasksContainer.appendChild(newTaskContainer);
-        _displayTaskInput();        
+        EventHandler.activateEditButton(newTaskEditButton);
+
+        _displayTaskInput();
+    }
+
+    const displayEditTask = e=>{
+        const editButton = e.currentTarget;
+        const projectNumber = getElement('.selected').dataset.index;
+        const taskNumber = editButton.parentElement.dataset.task;
+        const editTask = projectFunctions.getAllProjects()[projectNumber].tasks[taskNumber];
+
+        const editTaskName = _makeNewElement('input', 'edit-task-name-input', 'edit-task-info','',{type:'text'}, {value:editTask.getName()});
+        const editTaskDescription = _makeNewElement('input', 'edit-task-description-input', 'edit-task-info','',{type:'text'}, {value:editTask.getDescription()});
+        const editTaskDate = _makeNewElement('input', 'edit-task-date-input', 'edit-task-info','Due Date',{type:'date'}, {value:editTask.getDate()});
+        const editTaskPriority = _makeNewElement('select', 'edit-task-priority-input', 'edit-task-info','');
+        const editTaskPriorityLow = _makeNewElement('option','','','Low', {value:'Low'},{style:'background-color:#E1ADAD'});
+        const editTaskPriorityMedium = _makeNewElement('option','','','Medium', {value:"Medium"}, {style:'background-color:#EFEF38'});
+        const editTaskPriorityHigh = _makeNewElement('option','','','High', {value:"High"}, {style:'background-color:#9DCD8D'});
+        
+        if(editTask.getPriority() == 'Low'){
+            editTaskPriorityLow.setAttribute('selected', 'selected')
+        }else if(editTask.getPriority() == 'Medium'){
+            editTaskPriorityMedium.setAttribute('selected', 'selected')
+        }else if(editTask.getPriority() == 'High'){
+            editTaskPriorityHigh.setAttribute('selected', 'selected')
+        }
+        getElements(`#project-${projectNumber}-task-${taskNumber}-container .task-info`).forEach(ele=>ele.remove())
+
+        editTaskPriority.appendChild(editTaskPriorityLow);
+        editTaskPriority.appendChild(editTaskPriorityMedium);
+        editTaskPriority.appendChild(editTaskPriorityHigh);
+
+        const editCancelButton = _makeNewElement('button', `project-${projectNumber}-task-${taskNumber}-edit-cancel-button`, 'task-button');
+        const editCancelIcon = _makeNewElement('i', '', 'fa-solid fa-xmark edit-cancel-icon');
+        const editCancelText =_makeNewElement('span', '', 'edit-cancel-text', 'Cancel')
+
+        editCancelButton.appendChild(editCancelIcon);
+        editCancelButton.appendChild(editCancelText);
+
+        const editTaskContainer = getElement(`#project-${projectNumber}-task-${taskNumber}-container`)
+        editTaskContainer.insertBefore(editTaskName, editTaskContainer.lastElementChild);
+        editTaskContainer.insertBefore(editTaskDescription, editTaskContainer.lastElementChild);
+        editTaskContainer.insertBefore(editTaskDate, editTaskContainer.lastElementChild);
+        editTaskContainer.insertBefore(editTaskPriority, editTaskContainer.lastElementChild);
+        editTaskContainer.appendChild(editCancelButton);
+
+        editButton.firstElementChild.classList.remove('fa-pencil');
+        editButton.firstElementChild.classList.add('fa-check');
+        editButton.lastElementChild.textContent = "Confirm";
+
+        EventHandler.activateConfirmEdit(editButton);
+
+    }
+
+    const cancelEdit = (e)=>{
+
     }
 
     return {getElement, getElements, fixStartingAnimations,checkNewProject, setupNewProject, cancelNewProject,
          getNewProjInfo, addProjectToList, expandToggle, showProject, getNewTaskInfo, checkNewTask, 
-         addTaskToList}
+         addTaskToList, displayEditTask, cancelEdit}
 })();
 
 export default DOMManip;

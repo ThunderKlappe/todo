@@ -26,7 +26,19 @@ const EventHandler = (()=>{
         DOMManip.getElement('#add-task-button').addEventListener('click', projectFunctions.addTask);
     }
 
-    return{activateAddButton, initStartingListeners, addProjectSubmission, activateProjects, activateAddTaskButton}
+    const activateEditButton = button=>{
+        button.addEventListener('click', DOMManip.displayEditTask);
+    }
+
+    const activateConfirmEdit = button=>{
+        button.removeEventListener('click', DOMManip.displayEditTask);
+        button.addEventListener('click', projectFunctions.confirmEdit);
+        button.parentElement.lastElementChild.addEventListener('click', DOMManip.cancelEdit);
+
+    }
+
+    return{activateAddButton, initStartingListeners, addProjectSubmission, activateProjects, 
+        activateAddTaskButton, activateEditButton, activateConfirmEdit};
 })();
 
 

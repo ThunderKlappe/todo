@@ -25,12 +25,15 @@ const projectFunctions = (()=>{
             DOMManip.addTaskToList();
         }
     }
+    const confirmEdit = (e)=>{
+
+    }
 
     const getAllProjects = ()=>{
         return _allProjects.map(ele=>ele);
     }
 
-    return{addProject, addTask, getAllProjects}
+    return{addProject, addTask, confirmEdit, getAllProjects}
 
 })();
 

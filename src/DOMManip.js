@@ -96,11 +96,15 @@ const DOMManip = (()=>{
             _makeNewElement('div', `${type}-${index}`, `${type}-side-label ${(type=='project' && proj.isSelected())?'selected' : ''}`, proj.getTitle(), {'data-index': `${index}`}, )))
     }
 
+    const displayProjects = ()=>{
+        _revealArray(getElement('#projects-side').parentElement, projectFunctions.getAllProjects(), 'project');
+    }
+
     const addProjectToList = ()=>{
         _removeElement("#new-proj-input-container");
         _toggleActive('#add-project-button');
         _toggleActive('#add-project-button-text');
-        _revealArray(getElement('#projects-side').parentElement, projectFunctions.getAllProjects(), 'project');
+        displayProjects();
         EventHandler.activateAddButton();
         EventHandler.activateProjects();
     }
@@ -333,7 +337,7 @@ const DOMManip = (()=>{
 
     return {getElement, getElements, fixStartingAnimations,checkNewProject, setupNewProject, cancelNewProject,
          getNewProjInfo, addProjectToList, expandToggle, showProject, getTaskInfo, checkNewTask, 
-         addTaskToList, displayEditTask, updateTaskList, cancelEdit}
+         addTaskToList, displayEditTask, updateTaskList, cancelEdit, displayProjects}
 })();
 
 export default DOMManip;

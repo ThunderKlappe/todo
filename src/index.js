@@ -3,10 +3,11 @@ import DOMManip from './DOMManip';
 import EventHandler from './EventHandler';
 import Task from './Task.js'
 import { Project } from './Project';
+import dataStorage from './dataStorage';
 
 const projectFunctions = (()=>{
 
-    const _allProjects = [];
+    let _allProjects = [];
 
     const addProject = (e)=>{
         const newProjectInfo = DOMManip.getNewProjInfo();
@@ -14,6 +15,8 @@ const projectFunctions = (()=>{
         if(goodTask){
             _allProjects.push(new Project(newProjectInfo.title));
             DOMManip.addProjectToList();
+            dataStorage.saveData();
+
         }
     }
     const addTask = (e)=>{
@@ -23,6 +26,7 @@ const projectFunctions = (()=>{
             _allProjects[newTaskInfo.project].tasks.push(new Task(newTaskInfo.name, newTaskInfo.description, 
                 newTaskInfo.date, newTaskInfo.priority, '', newTaskInfo.project));
             DOMManip.addTaskToList();
+            dataStorage.saveData();
         }
     }
     const confirmEdit = (e)=>{
@@ -33,21 +37,30 @@ const projectFunctions = (()=>{
             _allProjects[editTaskInfo.project].tasks[editTask]=new Task(editTaskInfo.name, editTaskInfo.description, 
                 editTaskInfo.date, editTaskInfo.priority, '', editTaskInfo.project);
             DOMManip.updateTaskList(editTask);
+            dataStorage.saveData();
         }
     }
 
     const getAllProjects = ()=>{
         return _allProjects.map(ele=>ele);
     }
+    const loadProjects = ()=>{
+        _allProjects = dataStorage.loadData();
+    }
 
-    return{addProject, addTask, confirmEdit, getAllProjects}
+    return{addProject, addTask, confirmEdit, getAllProjects, loadProjects}
 
 })();
 
 const initWebsite = (()=>{
     setTimeout(DOMManip.fixStartingAnimations, 1);
     EventHandler.initStartingListeners();
+    projectFunctions.loadProjects();
+    DOMManip.displayProjects();
+    EventHandler.activateProjects();
 })();
+
+
 
 export {projectFunctions};
 

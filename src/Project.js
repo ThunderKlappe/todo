@@ -1,8 +1,8 @@
 export class Project{
-        constructor(initTitle){
+        constructor(initTitle, tasks = [], completed = false){
         this.title = initTitle;
-        this.tasks = [];
-        this.completed = false;
+        this.tasks = tasks;
+        this.completed = completed;
         this.selected = false;
     }
     getTitle(){return this.title;}

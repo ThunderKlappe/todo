@@ -195,16 +195,12 @@ select{
     
 }
 .task-info{
-    max-width: 35%;
+    max-width: 30vw;
     white-space: nowrap;
     overflow-y: auto;
 }
 
-input[type="checkbox" i] {
-    flex-grow: 0;
-    height: 15px;
-    width: 15px;
-}
+
 
 .error-message{
     font-size: 18px;
@@ -262,6 +258,13 @@ input[type="checkbox" i] {
 .task-container select{
     height: 23px;
     font-size:15px
+}
+
+
+input[type="checkbox" i] {
+    flex-grow: 0;
+    height: 15px;
+    width: 15px;
 }
 
 

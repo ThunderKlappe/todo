@@ -27,6 +27,7 @@ const EventHandler = (()=>{
     }
 
     const activateEditButton = button=>{
+        button.removeEventListener('click', projectFunctions.confirmEdit);
         button.addEventListener('click', DOMManip.displayEditTask);
     }
 

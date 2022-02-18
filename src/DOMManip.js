@@ -30,17 +30,11 @@ const DOMManip = (()=>{
     const _removeElement = (elementID) =>{
         getElement(elementID).remove();
     }
-    const _displayErrors = (input, type)=>{
+    const _displayErrors = (e, input, type)=>{
         input.forEach(ele=>{
             const error = _makeNewElement('div','','error-message', ele)
-            let parent;
-            if(type == "project"){
-                parent = getElement('#add-project-button-container-container');
-
-            }else if(type == 'task'){
-                parent = getElement('#main-display');
-            }
-            parent.firstElementChild.insertBefore(error, parent.firstElementChild.lastElementChild);
+            const parent = e.currentTarget.parentElement
+            parent.parentElement.insertBefore(error, parent);
             setTimeout(()=>error.style.opacity = 0, 2000);
             setTimeout(()=>error.remove(), 4000);
         })
@@ -76,13 +70,13 @@ const DOMManip = (()=>{
         return {title:DOMManip.getElement('#new-proj-input').value};
     }
     
-    const checkNewProject = (project)=>{
+    const checkNewProject = (e, project)=>{
         let errorMessages = [];
         if(project.title == ''){
             errorMessages.push('Please enter a title for the project');
         }
         if(errorMessages.length > 0){
-            _displayErrors(errorMessages, 'project');
+            _displayErrors(e, errorMessages, 'project');
             return false;
         }else{
             return true;
@@ -183,17 +177,23 @@ const DOMManip = (()=>{
         _displayTaskInput();
     }
 
-    const getNewTaskInfo = ()=>{
-        const formInfo = getElements('.add-task-info');
+    const getTaskInfo = (index)=>{
+        let formInfo;
+        const projectNumber = getElement('.selected').dataset.index;
+        if(index == undefined){
+            formInfo = getElements('.add-task-info');
+        }else{
+            formInfo = getElements(`#project-${projectNumber}-task-${index}-container .edit-task-info`)
+        }
         return {name:formInfo[0].value,
                 description: formInfo[1].value,
                 date: formInfo[2].value,
-                priority: getElement('#add-task-priority-input').value,
-                project: getElement('.selected').dataset.index}
+                priority: formInfo[3].value,
+                project: projectNumber}
         
     }
 
-    const checkNewTask = (task)=>{
+    const checkNewTask = (e, task)=>{
         let errorMessages = [];
         if(task.name == ''){
             errorMessages.push('Please enter a name for the task');
@@ -209,7 +209,7 @@ const DOMManip = (()=>{
         }
 
         if(errorMessages.length > 0){
-            _displayErrors(errorMessages, 'task');
+            _displayErrors(e, errorMessages, 'task');
             return false;
         }else{
             return true;
@@ -295,13 +295,39 @@ const DOMManip = (()=>{
 
     }
 
+    const updateTaskList = (taskNumber)=>{
+        const projectNumber = getElement('.selected').dataset.index;
+        const editTaskContainer = getElement(`#project-${projectNumber}-task-${taskNumber}-container`)
+        const editFields = getElements(`#project-${projectNumber}-task-${taskNumber}-container .edit-task-info`)
+        const updatedTask = projectFunctions.getAllProjects()[projectNumber].tasks[taskNumber];
+        const editButton = getElement(`#project-${projectNumber}-task-${taskNumber}-edit-button`);
+        editFields.forEach(ele=>ele.remove());
+
+        const updatedTaskName = _makeNewElement('div', `project-${projectNumber}-task-${taskNumber}-name`, 'task-name task-info', updatedTask.getName());
+        const updatedTaskDescription = _makeNewElement('div', `project-${projectNumber}-task-${taskNumber}-description`, 'task-description task-info', updatedTask.getDescription());
+        const updatedTaskDate = _makeNewElement('div', `project-${projectNumber}-task-${taskNumber}-date`, 'task-date task-info', updatedTask.getDate());
+
+        editTaskContainer.lastElementChild.remove();
+        editTaskContainer.insertBefore(updatedTaskName, editTaskContainer.lastElementChild);
+        editTaskContainer.insertBefore(updatedTaskDescription, editTaskContainer.lastElementChild);
+        editTaskContainer.insertBefore(updatedTaskDate, editTaskContainer.lastElementChild);
+        
+        editTaskContainer.setAttribute('data-priority', updatedTask.getPriority())
+
+        editButton.firstElementChild.classList.remove('fa-check');
+        editButton.firstElementChild.classList.add('fa-pencil');
+        editButton.lastElementChild.textContent = "Edit Task";
+
+        EventHandler.activateEditButton(editButton);
+    }
+
     const cancelEdit = (e)=>{
 
     }
 
     return {getElement, getElements, fixStartingAnimations,checkNewProject, setupNewProject, cancelNewProject,
-         getNewProjInfo, addProjectToList, expandToggle, showProject, getNewTaskInfo, checkNewTask, 
-         addTaskToList, displayEditTask, cancelEdit}
+         getNewProjInfo, addProjectToList, expandToggle, showProject, getTaskInfo, checkNewTask, 
+         addTaskToList, displayEditTask, updateTaskList, cancelEdit}
 })();
 
 export default DOMManip;

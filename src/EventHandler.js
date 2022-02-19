@@ -21,10 +21,10 @@ const EventHandler = (()=>{
     const activateProjects = ()=>{
         DOMManip.getElements('.project-side-label').forEach(ele=>ele.removeEventListener('click', DOMManip.showProject));
         DOMManip.getElements('.project-side-label').forEach(ele=>ele.addEventListener('click', DOMManip.showProject));
-
     }
     const activateSides = ()=>{
-        activateProjects()
+        activateProjects();
+        DOMManip.getElement('#todays-todo-side').addEventListener('click', DOMManip.showToday);
     }
     const activateProjectButtons = ()=>{
         DOMManip.getElement('.edit-button.title').addEventListener('click', DOMManip.displayEditProject);
@@ -58,9 +58,9 @@ const EventHandler = (()=>{
 
     }
 
-    return{activateAddButton, initStartingListeners, addProjectSubmission, activateProjects, activateSides, 
-        activateProjectButtons, activateAddTaskButton, activateEditButton, activateConfirmProjectEdit,
-        activateConfirmTaskEdit, activateCancelButton, activateDeleteProject};
+    return{activateAddButton, initStartingListeners, addProjectSubmission,activateProjects,
+        activateSides, activateSides, activateProjectButtons, activateAddTaskButton,
+        activateEditButton, activateConfirmProjectEdit, activateConfirmTaskEdit, activateCancelButton, activateDeleteProject};
 })();
 
 

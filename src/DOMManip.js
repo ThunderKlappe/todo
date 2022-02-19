@@ -1,7 +1,6 @@
 import { projectFunctions } from ".";
 import EventHandler from "./EventHandler";
-//import toDate from "date-fns/toDate";
-import { toDate, format, parseISO, subDays } from "date-fns";
+import { toDate, format, parseISO, subDays, isToday, parse } from "date-fns";
 
 const DOMManip = (()=>{
     const getElement = (selector)=>document.querySelector(selector)
@@ -219,17 +218,22 @@ const DOMManip = (()=>{
 
     const getTaskInfo = (index)=>{
         let formInfo;
+        let taskNumber;
         const projectNumber = _getProjectNumber();
         if(index == undefined){
             formInfo = getElements('.add-task-info');
+            taskNumber = projectFunctions.getAllProjects()[projectNumber].tasks.length;
         }else{
             formInfo = getElements(`#project-${projectNumber}-task-${index}-container .edit-task-info`)
+            taskNumber = index;
         }
         return {name:formInfo[0].value,
                 description: formInfo[1].value,
                 date: (formInfo[2].value ? format(toDate(parseISO(formInfo[2].value)),'MM/dd/yyyy') : ''),
                 priority: formInfo[3].value,
-                project: projectNumber}
+                project: projectNumber,
+                number:taskNumber
+            }
         
     }
 
@@ -261,8 +265,8 @@ const DOMManip = (()=>{
         existingNode.parentNode.insertBefore(newNode, existingNode.nextSibling);
     }
 
-    const _fillInTask = (task, taskNumber)=>{
-        const projectNumber = _getProjectNumber();
+    const _fillInTask = (task, taskNumber, index)=>{
+        const projectNumber = task.getProject();
         const tasksContainer = getElement('.tasks-container');
 
         const newTaskContainer = _makeNewElement('div', `project-${projectNumber}-task-${taskNumber}-container`, 'task-container', '', {'data-priority':task.getPriority()},{"data-task":taskNumber});
@@ -281,7 +285,7 @@ const DOMManip = (()=>{
         newTaskEditButton.appendChild(newTaskEditIcon);
         newTaskEditButton.appendChild(newTaskEditText);
         newTaskContainer.appendChild(newTaskEditButton);
-        _insertAfter(newTaskContainer, tasksContainer.childNodes[taskNumber]);
+        _insertAfter(newTaskContainer,tasksContainer.childNodes[index]);
         EventHandler.activateEditButton(newTaskEditButton);
     }
 
@@ -290,7 +294,7 @@ const DOMManip = (()=>{
         const editTaskContainer = getElement(`#project-${projectNumber}-task-${taskNumber}-container`)
         const updatedTask = projectFunctions.getAllProjects()[projectNumber].tasks[taskNumber];
         editTaskContainer.remove()
-        _fillInTask(updatedTask, taskNumber)
+        _fillInTask(updatedTask, taskNumber, taskNumber)
     }
 
     const addTaskToList = ()=>{
@@ -299,7 +303,7 @@ const DOMManip = (()=>{
         const newTask = projectFunctions.getAllProjects()[projectNumber].tasks[taskNumber];
 
         getElement('#add-task-container').remove();
-        _fillInTask(newTask, taskNumber);
+        _fillInTask(newTask, taskNumber, taskNumber);
         _displayTaskInput();
     }
 
@@ -360,6 +364,11 @@ const DOMManip = (()=>{
         EventHandler.activateProjectButtons();
     }
 
+    const cancelEdit = (e)=>{
+        const task = e.currentTarget.parentElement.dataset.task;
+        updateTaskList(task);
+    }
+
     const displayEditTask = e=>{
         const editButton = e.currentTarget;
         const projectNumber = _getProjectNumber()
@@ -368,7 +377,7 @@ const DOMManip = (()=>{
 
         const editTaskName = _makeNewElement('input', 'edit-task-name-input', 'edit-task-info','',{type:'text'}, {value:editTask.getName()});
         const editTaskDescription = _makeNewElement('input', 'edit-task-description-input', 'edit-task-info','',{type:'text'}, {value:editTask.getDescription()});
-        const editTaskDate = _makeNewElement('input', 'edit-task-date-input', 'edit-task-info','Due Date',{type:'date'}, {value:editTask.getDate()});
+        const editTaskDate = _makeNewElement('input', 'edit-task-date-input', 'edit-task-info','Due Date',{type:'date'}, {value:new Date(editTask.getDate()).toISOString().split('T')[0]}, {min:subDays(new Date(), 1).toISOString().split('T')[0]});
         const editTaskPriority = _makeNewElement('select', 'edit-task-priority-input', 'edit-task-info','');
         const editTaskPriorityLow = _makeNewElement('option','','','Low', {value:'Low'},{style:'background-color:#E1ADAD'});
         const editTaskPriorityMedium = _makeNewElement('option','','','Medium', {value:"Medium"}, {style:'background-color:#EFEF38'});
@@ -434,19 +443,56 @@ const DOMManip = (()=>{
         mainDisplay.appendChild(projectContainer);
         _displayTitle();
         EventHandler.activateProjectButtons();
-        currentProject.tasks.forEach((task, index) => _fillInTask(task, index))
+        currentProject.tasks.forEach((task, index) => _fillInTask(task, index, index))
         _displayTaskInput();
     }
 
-    const cancelEdit = (e)=>{
-        const task = e.currentTarget.parentElement.dataset.task;
-        updateTaskList(task);
+    const _getTodaysTasks = ()=>{
+        let todaysTasks = [];
+        projectFunctions.getAllProjects().forEach(proj=>{            
+            proj.tasks.forEach(task=>{
+                if(isToday(parse (task.getDate(), 'MM/dd/yyyy', new Date() ))){
+                    todaysTasks.push(task)
+                };
+            })
+        })
+        return todaysTasks;
+    }
+
+    const showToday = ()=>{
+        const todaysTasks = _getTodaysTasks();
+        const today = format(toDate(new Date()),'MM/dd/yyyy');
+        const mainDisplay = getElement('#main-display');
+
+        if(mainDisplay.childNodes.length >0){
+            mainDisplay.firstChild.remove();
+        }
+
+        const todayContainer = _makeNewElement('div', 'today-container', "project-container");
+        const todayTitle = _makeNewElement('div', 'today-title', 'project-title', `Today: ${today}`);
+        
+        const tasksContainer = _makeNewElement('div', `todays-tasks-container`, 'tasks-container');
+        const tasksWrapper = _makeNewElement('div', `todays-tasks-wrapper`, 'tasks-wrapper')
+        const spacer = _makeNewElement('div');
+        todayContainer.appendChild(todayTitle);
+        tasksContainer.appendChild(spacer);
+        tasksWrapper.appendChild(tasksContainer)
+        todayContainer.appendChild(tasksWrapper);
+        mainDisplay.appendChild(todayContainer);
+    
+
+        todaysTasks.forEach((task, index)=>{
+            //console.log(task, task.getName(), task.name, task.number, task.getNumber());
+           _fillInTask(task, task.getNumber(), index)
+        });
+        
+        
     }
 
     return {getElement, getElements, fixStartingAnimations,checkNewProject, setupNewProject, cancelNewProject,
          getNewProjInfo, updateProjectList, expandToggle, showProject, displayDeleteProject,
           getTaskInfo, checkNewTask, addTaskToList, displayEditProject, displayEditTask, 
-          updateTaskList, cancelEdit, displayProjects, cancelProjectEdit}
+          updateTaskList, cancelEdit, displayProjects, cancelProjectEdit, showToday}
 })();
 
 export default DOMManip;

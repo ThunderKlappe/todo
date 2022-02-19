@@ -18,7 +18,7 @@ const dataStorage = (()=>{
                 const loadProjectTitle = ele.title;
                 const loadProjectsTasks = [];
                 ele.tasks.forEach(task=>{
-                    loadProjectsTasks.push(new Task(task.name, task.description, task.dueDate, task.priority, task.notes, task.project))
+                    loadProjectsTasks.push(new Task(task.name, task.description, task.dueDate, task.priority, task.notes, task.project, task.number))
                 })
                 const loadProjectCompleted = ele.completed;
                 returnData.push(new Project(loadProjectTitle, loadProjectsTasks, loadProjectCompleted))

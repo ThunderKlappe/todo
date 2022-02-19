@@ -24,9 +24,10 @@ const projectFunctions = (()=>{
         const goodTask = DOMManip.checkNewTask(e, newTaskInfo);
         if(goodTask){
             _allProjects[newTaskInfo.project].tasks.push(new Task(newTaskInfo.name, newTaskInfo.description, 
-                newTaskInfo.date, newTaskInfo.priority, '', newTaskInfo.project));
+                newTaskInfo.date, newTaskInfo.priority, '', newTaskInfo.project, newTaskInfo.number));
             DOMManip.addTaskToList();
             dataStorage.saveData();
+            console.log(_allProjects);
         }
     }
     const confirmProjectEdit = (e)=>{
@@ -47,7 +48,7 @@ const projectFunctions = (()=>{
         const goodTask = DOMManip.checkNewTask(e, editTaskInfo);
         if(goodTask){
             _allProjects[editTaskInfo.project].tasks[editTask]=new Task(editTaskInfo.name, editTaskInfo.description, 
-                editTaskInfo.date, editTaskInfo.priority, '', editTaskInfo.project);
+                editTaskInfo.date, editTaskInfo.priority, '', editTaskInfo.project, editTaskInfo.number);
             DOMManip.updateTaskList(editTask);
             dataStorage.saveData();
         }
@@ -77,7 +78,7 @@ const initWebsite = (()=>{
     EventHandler.initStartingListeners();
     projectFunctions.loadProjects();
     DOMManip.displayProjects();
-    EventHandler.activateProjects();
+    EventHandler.activateSides();
 })();
 
 

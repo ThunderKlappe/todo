@@ -74,11 +74,7 @@ const projectFunctions = (()=>{
 })();
 
 const initWebsite = (()=>{
-    setTimeout(DOMManip.fixStartingAnimations, 1);
-    EventHandler.initStartingListeners();
-    projectFunctions.loadProjects();
-    DOMManip.displayProjects();
-    EventHandler.activateSides();
+    DOMManip.startPage();
 })();
 
 

@@ -5,13 +5,6 @@ import { toDate, format, parseISO, subDays, isToday, parse } from "date-fns";
 const DOMManip = (()=>{
     const getElement = (selector)=>document.querySelector(selector)
     const getElements = (selector)=>document.querySelectorAll(selector)
-
-    const fixStartingAnimations = ()=>{
-        const animatable = getElements(".fix-anim")
-        animatable.forEach(ele => {
-            ele.classList.add('anim');
-            ele.classList.remove('fix-anim')})
-    }
     
     const _makeNewElement = (type, id='', HTMLClass = '', text = '', ...attributes) =>{
         const newElem = document.createElement(type);
@@ -27,6 +20,53 @@ const DOMManip = (()=>{
         }
     
         return newElem;
+    }
+
+    const _fixStartingAnimations = ()=>{
+        const animatable = getElements(".fix-anim")
+        animatable.forEach(ele => {
+            ele.classList.add('anim');
+            ele.classList.remove('fix-anim')})
+    }
+
+    const _makeStartingPage = ()=>{
+        const header = _makeNewElement('div', 'header', '', 'To-Do List')
+        document.body.appendChild(header);
+
+        const content = _makeNewElement('div', 'content');
+        
+        const sidePanel = _makeNewElement('div', 'side-panel')
+
+        const todaySideHeaderContainer = _makeNewElement('div', '', 'side-header-container');
+        const todaysTodoSide = _makeNewElement('div', 'todays-todo-side', 'side-header', 'Today');
+        const todaySideDropdown = _makeNewElement('div', '', 'dropdown-toggle fix-anim fa-solid fa-caret-down')
+        todaysTodoSide.appendChild(todaySideDropdown);
+        todaySideHeaderContainer.appendChild(todaysTodoSide);
+
+        const projectSideHeaderContainer = _makeNewElement('div', '', 'side-header-container');
+        const projectsSide = _makeNewElement('div', 'projects-side', 'side-header', 'Projects');
+        const projectSideDropdown = _makeNewElement('div', '', 'dropdown-toggle fix-anim fa-solid fa-caret-down')
+        projectsSide.appendChild(projectSideDropdown);
+        projectSideHeaderContainer.appendChild(projectsSide);
+
+        sidePanel.appendChild(todaySideHeaderContainer);
+        sidePanel.appendChild(projectSideHeaderContainer);
+
+        const mainDisplay = _makeNewElement('div', 'main-display');
+
+        const addProjectButtonWrapper = _makeNewElement('div', 'add-project-button-wrapper');
+        const addProjectButtonContainer = _makeNewElement('div', 'add-project-button-container')
+        const addProjctButton = _makeNewElement('button', 'add-project-button', 'add-button fix-anim', '+');
+        const addProjctButtonText = _makeNewElement('span', 'add-project-button-text', 'fix-anim', 'Project');
+        addProjctButton.appendChild(addProjctButtonText);
+        addProjectButtonContainer.appendChild(addProjctButton);
+        addProjectButtonWrapper.appendChild(addProjectButtonContainer);
+
+        content.appendChild(sidePanel);
+        content.appendChild(mainDisplay);
+        content.appendChild(addProjectButtonWrapper);
+        document.body.appendChild(content);
+
     }
 
     const _displayErrors = (e, input, type)=>{
@@ -91,7 +131,7 @@ const DOMManip = (()=>{
     }
 
     const _removeSubElements = (element)=>{
-        for(let i = element.childNodes.length; i > 2; i--){
+        for(let i = element.childNodes.length; i > 1; i--){
             element.childNodes[i-1].remove();
         }
     }
@@ -101,7 +141,7 @@ const DOMManip = (()=>{
             _makeNewElement('div', `${type}-${index}`, `${type}-side-label ${(type=='project' && proj.isSelected())?'selected' : ''}`, proj.getTitle(), {'data-index': `${index}`}, )))
     }
 
-    const displayProjects = ()=>{
+    const _displayProjects = ()=>{
         _revealArray(getElement('#projects-side').parentElement, projectFunctions.getAllProjects(), 'project');
     }
 
@@ -144,7 +184,7 @@ const DOMManip = (()=>{
             EventHandler.activateProjectButtons();
         }
         
-        displayProjects();
+        _displayProjects();
         EventHandler.activateAddButton();
         EventHandler.activateProjects();
     }
@@ -169,13 +209,21 @@ const DOMManip = (()=>{
     }
 
     const _markSelectedProject = (e)=>{
-        if(e){
+        if(e.currentTarget.classList.contains('project-side-label')){
             getElements(".project-side-label").forEach(ele=>ele.classList.remove('selected'));
+            getElement('#todays-todo-side').classList.remove('selected');
             projectFunctions.getAllProjects().forEach(proj => proj.markSelected(false));
             projectFunctions.getAllProjects()[e.target.dataset.index].markSelected(true);
             e.target.classList.add('selected');
-        }else{
+        }
+        else if(e.currentTarget.id == 'todays-todo-side'){
             getElements(".project-side-label").forEach(ele=>ele.classList.remove('selected'));
+            projectFunctions.getAllProjects().forEach(proj => proj.markSelected(false));
+            getElement('#todays-todo-side').classList.add('selected');
+        }
+        else{
+            getElements(".project-side-label").forEach(ele=>ele.classList.remove('selected'));
+            getElement('#todays-todo-side').classList.remove('selected');
             projectFunctions.getAllProjects().forEach(proj => proj.markSelected(false));
             projectFunctions.getAllProjects()[0].markSelected(true);
             getElements('.project-side-label')[0].classList.add('selected');
@@ -459,7 +507,9 @@ const DOMManip = (()=>{
         return todaysTasks;
     }
 
-    const showToday = ()=>{
+    const showToday = (e)=>{
+        _markSelectedProject(e);
+
         const todaysTasks = _getTodaysTasks();
         const today = format(toDate(new Date()),'MM/dd/yyyy');
         const mainDisplay = getElement('#main-display');
@@ -469,12 +519,14 @@ const DOMManip = (()=>{
         }
 
         const todayContainer = _makeNewElement('div', 'today-container', "project-container");
+        const todayTitleWrapper = _makeNewElement('div' , `today-title-wrapper`, 'project-title-wrapper');
         const todayTitle = _makeNewElement('div', 'today-title', 'project-title', `Today: ${today}`);
         
         const tasksContainer = _makeNewElement('div', `todays-tasks-container`, 'tasks-container');
         const tasksWrapper = _makeNewElement('div', `todays-tasks-wrapper`, 'tasks-wrapper')
         const spacer = _makeNewElement('div');
-        todayContainer.appendChild(todayTitle);
+        todayTitleWrapper.appendChild(todayTitle);
+        todayContainer.appendChild(todayTitleWrapper);
         tasksContainer.appendChild(spacer);
         tasksWrapper.appendChild(tasksContainer)
         todayContainer.appendChild(tasksWrapper);
@@ -489,10 +541,20 @@ const DOMManip = (()=>{
         
     }
 
-    return {getElement, getElements, fixStartingAnimations,checkNewProject, setupNewProject, cancelNewProject,
+    const startPage = ()=>{
+        _makeStartingPage();
+        setTimeout(_fixStartingAnimations, 1);
+        EventHandler.initStartingListeners();
+        projectFunctions.loadProjects();
+        _displayProjects();
+        EventHandler.activateSides();
+        getElement('#todays-todo-side').click();
+    }
+
+    return {getElement, getElements,checkNewProject, setupNewProject, cancelNewProject,
          getNewProjInfo, updateProjectList, expandToggle, showProject, displayDeleteProject,
           getTaskInfo, checkNewTask, addTaskToList, displayEditProject, displayEditTask, 
-          updateTaskList, cancelEdit, displayProjects, cancelProjectEdit, showToday}
+          updateTaskList, cancelEdit, cancelProjectEdit, showToday, startPage}
 })();
 
 export default DOMManip;

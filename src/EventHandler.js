@@ -2,6 +2,7 @@ import DOMManip from "./DOMManip";
 import { projectFunctions } from "./index.js";
 
 const EventHandler = (()=>{
+    
     const activateAddButton = ()=>{
         DOMManip.getElement("#add-project-button").removeEventListener('click', DOMManip.cancelNewProject);
         DOMManip.getElement("#add-project-button").addEventListener('click', DOMManip.setupNewProject);
@@ -58,7 +59,7 @@ const EventHandler = (()=>{
 
     }
 
-    return{activateAddButton, initStartingListeners, addProjectSubmission,activateProjects,
+    return{ activateAddButton, initStartingListeners, addProjectSubmission,activateProjects,
         activateSides, activateSides, activateProjectButtons, activateAddTaskButton,
         activateEditButton, activateConfirmProjectEdit, activateConfirmTaskEdit, activateCancelButton, activateDeleteProject};
 })();

@@ -40,6 +40,7 @@ const projectFunctions = (()=>{
 
         }
     }
+    
     const confirmTaskEdit = (e)=>{
         const editTask = e.currentTarget.parentElement.dataset.task;
         const editTaskInfo = DOMManip.getTaskInfo(editTask);
@@ -52,6 +53,14 @@ const projectFunctions = (()=>{
         }
     }
 
+    const deleteProject = ()=>{
+        const projectNumber = DOMManip.getElement('.selected').dataset.index;
+        _allProjects.splice(projectNumber, 1);
+        DOMManip.updateProjectList();
+        DOMManip.showProject();
+        dataStorage.saveData();
+    }
+
     const getAllProjects = ()=>{
         return _allProjects.map(ele=>ele);
     }
@@ -59,7 +68,7 @@ const projectFunctions = (()=>{
         _allProjects = dataStorage.loadData();
     }
 
-    return{addProject, addTask, confirmProjectEdit, confirmTaskEdit, getAllProjects, loadProjects}
+    return{addProject, addTask, confirmProjectEdit, confirmTaskEdit, deleteProject, getAllProjects, loadProjects}
 
 })();
 

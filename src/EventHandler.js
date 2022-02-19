@@ -19,23 +19,36 @@ const EventHandler = (()=>{
     }
 
     const activateProjects = ()=>{
+        DOMManip.getElements('.project-side-label').forEach(ele=>ele.removeEventListener('click', DOMManip.showProject));
         DOMManip.getElements('.project-side-label').forEach(ele=>ele.addEventListener('click', DOMManip.showProject));
 
     }
-    const activateEditProject = ()=>{
-        DOMManip.getElement('.project-title-wrapper button').addEventListener('click', DOMManip.displayEditProject);
+    const activateSides = ()=>{
+        activateProjects()
+    }
+    const activateProjectButtons = ()=>{
+        DOMManip.getElement('.edit-button.title').addEventListener('click', DOMManip.displayEditProject);
+        DOMManip.getElement('.edit-button.delete').addEventListener('click', DOMManip.displayDeleteProject);
+    }
+
+    const activateCancelButton =(button)=>{
+        button.addEventListener('click', DOMManip.cancelProjectEdit)
+
     }
     const activateAddTaskButton = ()=>{
         DOMManip.getElement('#add-task-button').addEventListener('click', projectFunctions.addTask);
     }
 
     const activateEditButton = button=>{
-        button.removeEventListener('click', projectFunctions.confirmEdit);
+        button.removeEventListener('click', projectFunctions.confirmTaskEdit);
         button.addEventListener('click', DOMManip.displayEditTask);
     }
     const activateConfirmProjectEdit = button=>{
         button.removeEventListener('click', DOMManip.displayEditProject)
         button.addEventListener('click', projectFunctions.confirmProjectEdit);
+    }
+    const activateDeleteProject = button=>{
+        button.addEventListener('click',projectFunctions.deleteProject)
     }
 
     const activateConfirmTaskEdit = button=>{
@@ -45,9 +58,9 @@ const EventHandler = (()=>{
 
     }
 
-    return{activateAddButton, initStartingListeners, addProjectSubmission, activateProjects, 
-        activateEditProject, activateAddTaskButton, activateEditButton, activateConfirmProjectEdit,
-        activateConfirmTaskEdit};
+    return{activateAddButton, initStartingListeners, addProjectSubmission, activateProjects, activateSides, 
+        activateProjectButtons, activateAddTaskButton, activateEditButton, activateConfirmProjectEdit,
+        activateConfirmTaskEdit, activateCancelButton, activateDeleteProject};
 })();
 
 

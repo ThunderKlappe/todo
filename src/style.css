@@ -202,6 +202,14 @@ select{
     overflow-y: auto;
 }
 
+.button-container.project{
+    width: 27.5px;
+    background-color: inherit;
+}
+.button-container button{
+    margin-top: 10px;
+}
+
 #add-task-button{
     font-size: 18px;
     padding: 5px 12px;
@@ -258,7 +266,7 @@ select{
     border: 1px solid #2f6363;
     color: #2f6363;
     transition: .25s;
-    min-width: fit-content;
+    min-width: 27.5px;
     height: 20px;
     white-space: nowrap;
 
@@ -277,6 +285,13 @@ select{
     font-size: 14px;
     opacity: 1;
     padding: 0px 5px;
+}
+
+.edit-button.confirm:hover{
+    background-color: #9DCD8D;
+}
+.edit-button.delete:hover, .edit-button.cancel:hover{
+    background-color: #E1ADAD;
 }
 
 .task-container input, .task-container select{

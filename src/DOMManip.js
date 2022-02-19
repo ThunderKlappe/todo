@@ -27,9 +27,7 @@ const DOMManip = (()=>{
     
         return newElem;
     }
-    const _removeElement = (elementID) =>{
-        getElement(elementID).remove();
-    }
+
     const _displayErrors = (e, input, type)=>{
         input.forEach(ele=>{
             const error = _makeNewElement('div','','error-message', ele)
@@ -61,7 +59,7 @@ const DOMManip = (()=>{
     const cancelNewProject = ()=>{
         _toggleActive('#add-project-button');
         _toggleActive('#add-project-button-text');
-        _removeElement("#new-proj-input-container");
+        getElement("#new-proj-input-container").remove();
         EventHandler.activateAddButton();
 
     }
@@ -85,13 +83,19 @@ const DOMManip = (()=>{
     }
 
 
-    const _removeSubEntries = (element)=>{
+    const _removeAllChildren = (element)=>{
+        for(let i = element.childNodes.length; i > 0; i--){
+            element.childNodes[i-1].remove();
+        }
+    }
+
+    const _removeSubElements = (element)=>{
         for(let i = element.childNodes.length; i > 2; i--){
             element.childNodes[i-1].remove();
         }
     }
     const _revealArray = (parent, array, type)=>{
-        _removeSubEntries(parent);
+        _removeSubElements(parent);
         array.forEach((proj, index)=> parent.appendChild(
             _makeNewElement('div', `${type}-${index}`, `${type}-side-label ${(type=='project' && proj.isSelected())?'selected' : ''}`, proj.getTitle(), {'data-index': `${index}`}, )))
     }
@@ -104,29 +108,39 @@ const DOMManip = (()=>{
         const projectNumber = _getProjectNumber();
         const currentProject = projectFunctions.getAllProjects()[projectNumber];
         const titleWrapper = getElement('.project-title-wrapper');
-        
+        const titleButtonContainer = _makeNewElement('div', `project-${projectNumber}-title-button-container`, 'button-container project');
         const projectTitle = _makeNewElement('div', `project-${projectNumber}-title`, 'project-title', `${currentProject.getTitle()}`);
-        const editTitleButton = _makeNewElement('button', `project-${projectNumber}-edit-button`, 'edit-button');
+        
+        const editTitleButton = _makeNewElement('button', `project-${projectNumber}-edit-button`, 'edit-button title');
         const editTitleIcon = _makeNewElement('i', '', 'fa-solid fa-pencil edit-icon');
         const editTitleText =_makeNewElement('span', '', 'edit-text', 'Edit Title')
         editTitleButton.appendChild(editTitleIcon);
         editTitleButton.appendChild(editTitleText);
+
+        const deleteProjectButton = _makeNewElement('button', `project-${projectNumber}-delete-button`, 'edit-button delete');
+        const deleteProjectIcon = _makeNewElement('i', '', 'fa-solid fa-trash edit-icon');
+        const deleteProjectText =_makeNewElement('span', '', 'edit-text', 'Delete Project')
+        deleteProjectButton.appendChild(deleteProjectIcon);
+        deleteProjectButton.appendChild(deleteProjectText);
+
+        titleButtonContainer.appendChild(editTitleButton)
+        titleButtonContainer.appendChild(deleteProjectButton)
+
         if(titleWrapper.childNodes.length >0){
-            titleWrapper.firstElementChild.remove();
-            titleWrapper.lastElementChild.remove();
+            _removeAllChildren(titleWrapper)
         }
         titleWrapper.appendChild(projectTitle);
-        titleWrapper.appendChild(editTitleButton);
+        titleWrapper.appendChild(titleButtonContainer);
     }
     const updateProjectList = ()=>{
         if(getElement('#new-proj-input-container')){
-            _removeElement("#new-proj-input-container");
+            getElement("#new-proj-input-container").remove();
             _toggleActive('#add-project-button');
             _toggleActive('#add-project-button-text');
         }
         if(getElement('.title-edit')){
             _displayTitle()
-            EventHandler.activateEditProject();
+            EventHandler.activateProjectButtons();
         }
         
         displayProjects();
@@ -145,18 +159,26 @@ const DOMManip = (()=>{
         if(e.target.classList.contains('closed')){
             e.target.classList.remove('closed')
             _revealArray(e.target.parentElement.parentElement, array, type);
+            EventHandler.activateSides();
         }else{
             e.target.classList.add('closed');
-            _removeSubEntries(e.target.parentElement.parentElement)
+            _removeSubElements(e.target.parentElement.parentElement)
         }
 
     }
 
     const _markSelectedProject = (e)=>{
-        getElements(".project-side-label").forEach(ele=>ele.classList.remove('selected'));
-        projectFunctions.getAllProjects().forEach(proj => proj.markSelected(false));
-        projectFunctions.getAllProjects()[e.target.dataset.index].markSelected(true);
-        e.target.classList.add('selected');
+        if(e){
+            getElements(".project-side-label").forEach(ele=>ele.classList.remove('selected'));
+            projectFunctions.getAllProjects().forEach(proj => proj.markSelected(false));
+            projectFunctions.getAllProjects()[e.target.dataset.index].markSelected(true);
+            e.target.classList.add('selected');
+        }else{
+            getElements(".project-side-label").forEach(ele=>ele.classList.remove('selected'));
+            projectFunctions.getAllProjects().forEach(proj => proj.markSelected(false));
+            projectFunctions.getAllProjects()[0].markSelected(true);
+            getElements('.project-side-label')[0].classList.add('selected');
+        }
     }
 
     const _displayTaskInput = ()=>{
@@ -279,20 +301,61 @@ const DOMManip = (()=>{
         _displayTaskInput();
     }
 
+    const _displayConfirmCancel = ()=>{
+        const projectButtonContainer = getElement('.button-container');
+        const projectNumber = _getProjectNumber();
+        const confirmContainer = _makeNewElement('div', `project-${projectNumber}-delete-button-container`, 'button-container concan');
+       
+        const confirmProjectButton = _makeNewElement('button', `project-${projectNumber}-confirm-delete-button`, 'edit-button confirm');
+        const confirmProjectIcon = _makeNewElement('i', '', 'fa-solid fa-check edit-icon');
+        const confirmProjectText =_makeNewElement('span', '', 'edit-text', 'Confirm')
+        confirmProjectButton.appendChild(confirmProjectIcon);
+        confirmProjectButton.appendChild(confirmProjectText);
+
+        const cancelProjectButton = _makeNewElement('button', `project-${projectNumber}-cancel-delete-button`, 'edit-button cancel');
+        const cancelProjectIcon = _makeNewElement('i', '', 'fa-solid fa-xmark edit-icon');
+        const cancelProjectText =_makeNewElement('span', '', 'edit-text', 'Cancel')
+        cancelProjectButton.appendChild(cancelProjectIcon);
+        cancelProjectButton.appendChild(cancelProjectText);
+
+        confirmContainer.appendChild(confirmProjectButton);
+        confirmContainer.appendChild(cancelProjectButton);
+
+        projectButtonContainer.appendChild(confirmContainer);
+    }
+
     const displayEditProject = (e)=>{
         const projectNumber = _getProjectNumber();
         const projecTitle = projectFunctions.getAllProjects()[projectNumber].getTitle();
         const titleWrapper = getElement('.project-title-wrapper');
-        const editButton = e.currentTarget;
 
         const projectTitleInput = _makeNewElement('input', `project-${projectNumber}-title-input`, 'title-edit', '', {type:'text'}, {value:projecTitle}, {'data-project':projectNumber});
         titleWrapper.insertBefore(projectTitleInput, titleWrapper.lastElementChild);
         titleWrapper.firstElementChild.remove();
 
-        editButton.firstElementChild.classList.remove('fa-pencil');
-        editButton.firstElementChild.classList.add('fa-check');
-        editButton.lastElementChild.textContent = "Confirm";
-        EventHandler.activateConfirmProjectEdit(editButton);
+        const projectButtonContainer = getElement('.button-container');
+        _removeAllChildren(projectButtonContainer);
+
+        _displayConfirmCancel();
+        
+        EventHandler.activateConfirmProjectEdit(getElement('.edit-button.confirm'));
+        EventHandler.activateCancelButton(getElement('.edit-button.cancel'))
+    }
+    const displayDeleteProject= ()=>{
+        const projectNumber = _getProjectNumber()
+        const projectButtonContainer = getElement('.button-container');
+        _removeAllChildren(projectButtonContainer);
+
+        _displayConfirmCancel();
+
+        EventHandler.activateDeleteProject(getElement('.edit-button.confirm'));
+        EventHandler.activateCancelButton(getElement('.edit-button.cancel'))
+
+    }
+    const cancelProjectEdit = ()=>{
+        const titleWrapper = getElement('.project-title-wrapper')
+        _displayTitle();
+        EventHandler.activateProjectButtons();
     }
 
     const displayEditTask = e=>{
@@ -368,9 +431,9 @@ const DOMManip = (()=>{
         projectContainer.appendChild(tasksWrapper);
         mainDisplay.appendChild(projectContainer);
         _displayTitle();
+        EventHandler.activateProjectButtons();
         currentProject.tasks.forEach((task, index) => _fillInTask(task, index))
         _displayTaskInput();
-        EventHandler.activateEditProject();
     }
 
     const cancelEdit = (e)=>{
@@ -379,8 +442,9 @@ const DOMManip = (()=>{
     }
 
     return {getElement, getElements, fixStartingAnimations,checkNewProject, setupNewProject, cancelNewProject,
-         getNewProjInfo, updateProjectList, expandToggle, showProject, getTaskInfo, checkNewTask, 
-         addTaskToList, displayEditProject, displayEditTask, updateTaskList, cancelEdit, displayProjects}
+         getNewProjInfo, updateProjectList, expandToggle, showProject, displayDeleteProject,
+          getTaskInfo, checkNewTask, addTaskToList, displayEditProject, displayEditTask, 
+          updateTaskList, cancelEdit, displayProjects, cancelProjectEdit}
 })();
 
 export default DOMManip;

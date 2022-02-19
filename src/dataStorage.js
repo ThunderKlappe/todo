@@ -7,7 +7,6 @@ const dataStorage = (()=>{
     const saveData = ()=>{
         const allProj = projectFunctions.getAllProjects()
         localStorage.setItem('Projects', JSON.stringify(allProj))
-        console.log(localStorage.getItem('Projects'))
     }
 
     const loadData = ()=>{

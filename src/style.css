@@ -48,10 +48,13 @@ body{
     padding-bottom: 8px;
     display: flex;
 }
-.project-side-label{
+.project-side-label, .task-side-label{
     font-size: 18px;
     margin: 4px 0px 4px 20px;
     padding: 4px 0px 4px 10px;
+}
+.task-side-label{
+    margin: 0px 0px 0px 20px;
 }
 .selected{
     background-color: #265252;

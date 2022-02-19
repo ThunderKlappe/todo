@@ -15,10 +15,10 @@ const dataStorage = (()=>{
             const loadedData = JSON.parse(localStorage.getItem('Projects'))
             const returnData = [];
             loadedData.forEach(ele => {
-                const loadProjectTitle = ele.title;
+                const loadProjectTitle = ele.name;
                 const loadProjectsTasks = [];
                 ele.tasks.forEach(task=>{
-                    loadProjectsTasks.push(new Task(task.name, task.description, task.dueDate, task.priority, task.notes, task.project, task.number))
+                    loadProjectsTasks.push(new Task(task.name, task.description, task.dueDate, task.priority, task.notes, task.project))
                 })
                 const loadProjectCompleted = ele.completed;
                 returnData.push(new Project(loadProjectTitle, loadProjectsTasks, loadProjectCompleted))

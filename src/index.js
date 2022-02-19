@@ -13,7 +13,7 @@ const projectFunctions = (()=>{
         const newProjectInfo = DOMManip.getNewProjInfo();
         const goodProject = DOMManip.checkNewProject(e,newProjectInfo);
         if(goodProject){
-            _allProjects.push(new Project(newProjectInfo.title));
+            _allProjects.push(new Project(newProjectInfo.name));
             DOMManip.updateProjectList();
             dataStorage.saveData();
 
@@ -33,7 +33,7 @@ const projectFunctions = (()=>{
     const confirmProjectEdit = (e)=>{
         const editTitle = DOMManip.getElement('.title-edit').value;
         const projectNumber = DOMManip.getElement('.title-edit').dataset.project;
-        const goodProject = DOMManip.checkNewProject(e,{title:editTitle});
+        const goodProject = DOMManip.checkNewProject(e,{name:editTitle});
         if(goodProject){
             _allProjects[projectNumber].setTitle(editTitle);
             DOMManip.updateProjectList();

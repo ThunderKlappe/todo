@@ -1,6 +1,8 @@
 import { projectFunctions } from ".";
 import EventHandler from "./EventHandler";
 import { toDate, format, parseISO, subDays, isToday, parse } from "date-fns";
+import { Project } from "./Project.js";
+import { Task } from "./Task.js"
 
 const DOMManip = (()=>{
     const getElement = (selector)=>document.querySelector(selector)
@@ -39,13 +41,13 @@ const DOMManip = (()=>{
 
         const todaySideHeaderContainer = _makeNewElement('div', '', 'side-header-container');
         const todaysTodoSide = _makeNewElement('div', 'todays-todo-side', 'side-header', 'Today');
-        const todaySideDropdown = _makeNewElement('div', '', 'dropdown-toggle fix-anim fa-solid fa-caret-down')
+        const todaySideDropdown = _makeNewElement('div', 'today-toggle', 'dropdown-toggle fix-anim fa-solid fa-caret-down')
         todaysTodoSide.appendChild(todaySideDropdown);
         todaySideHeaderContainer.appendChild(todaysTodoSide);
 
         const projectSideHeaderContainer = _makeNewElement('div', '', 'side-header-container');
         const projectsSide = _makeNewElement('div', 'projects-side', 'side-header', 'Projects');
-        const projectSideDropdown = _makeNewElement('div', '', 'dropdown-toggle fix-anim fa-solid fa-caret-down')
+        const projectSideDropdown = _makeNewElement('div', 'projects-toggle', 'dropdown-toggle fix-anim fa-solid fa-caret-down')
         projectsSide.appendChild(projectSideDropdown);
         projectSideHeaderContainer.appendChild(projectsSide);
 
@@ -67,6 +69,18 @@ const DOMManip = (()=>{
         content.appendChild(addProjectButtonWrapper);
         document.body.appendChild(content);
 
+    }
+
+    const _getTodaysTasks = ()=>{
+        let todaysTasks = [];
+        projectFunctions.getAllProjects().forEach(proj=>{            
+            proj.tasks.forEach(task=>{
+                if(isToday(parse (task.getDate(), 'MM/dd/yyyy', new Date() ))){
+                    todaysTasks.push(task)
+                };
+            })
+        })
+        return todaysTasks;
     }
 
     const _displayErrors = (e, input, type)=>{
@@ -106,12 +120,12 @@ const DOMManip = (()=>{
     }
 
     const getNewProjInfo = ()=>{
-        return {title:DOMManip.getElement('#new-proj-input').value};
+        return {name:DOMManip.getElement('#new-proj-input').value};
     }
     
     const checkNewProject = (e, project)=>{
         let errorMessages = [];
-        if(project.title == ''){
+        if(project.name == ''){
             errorMessages.push('Please enter a title for the project');
         }
         if(errorMessages.length > 0){
@@ -137,8 +151,13 @@ const DOMManip = (()=>{
     }
     const _revealArray = (parent, array, type)=>{
         _removeSubElements(parent);
-        array.forEach((proj, index)=> parent.appendChild(
-            _makeNewElement('div', `${type}-${index}`, `${type}-side-label ${(type=='project' && proj.isSelected())?'selected' : ''}`, proj.getTitle(), {'data-index': `${index}`}, )))
+        array.forEach((elem, index)=> parent.appendChild(
+            _makeNewElement('div', `${type}-${index}`, `${type}-side-label ${(type=='project' && elem.isSelected())?'selected' : ''}`, elem.getName(), {'data-index': `${index}`}, )))
+    }
+
+    const _displayTodaySide = ()=>{
+        _revealArray(getElement('#todays-todo-side').parentElement, _getTodaysTasks(), 'task');
+
     }
 
     const _displayProjects = ()=>{
@@ -150,7 +169,7 @@ const DOMManip = (()=>{
         const currentProject = projectFunctions.getAllProjects()[projectNumber];
         const titleWrapper = getElement('.project-title-wrapper');
         const titleButtonContainer = _makeNewElement('div', `project-${projectNumber}-title-button-container`, 'button-container project');
-        const projectTitle = _makeNewElement('div', `project-${projectNumber}-title`, 'project-title', `${currentProject.getTitle()}`);
+        const projectTitle = _makeNewElement('div', `project-${projectNumber}-title`, 'project-title', `${currentProject.getName()}`);
         
         const editTitleButton = _makeNewElement('button', `project-${projectNumber}-edit-button`, 'edit-button title');
         const editTitleIcon = _makeNewElement('i', '', 'fa-solid fa-pencil edit-icon');
@@ -183,19 +202,24 @@ const DOMManip = (()=>{
             _displayTitle()
             EventHandler.activateProjectButtons();
         }
-        
-        _displayProjects();
-        EventHandler.activateAddButton();
-        EventHandler.activateProjects();
+        if(!getElement('#projects-toggle').classList.contains('closed')){
+            _displayProjects();
+            EventHandler.activateAddButton();
+            EventHandler.activateProjects();
+        }
     }
 
     const expandToggle = (e)=>{
         let array = [];
         let type = '';
+        let parent = '';
         if(e.target.parentElement.id == 'projects-side')
         {
             array = projectFunctions.getAllProjects();
             type = 'project';
+        }else{
+            array = _getTodaysTasks();
+            type = 'task';
         }
         if(e.target.classList.contains('closed')){
             e.target.classList.remove('closed')
@@ -343,6 +367,7 @@ const DOMManip = (()=>{
         const updatedTask = projectFunctions.getAllProjects()[projectNumber].tasks[taskNumber];
         editTaskContainer.remove()
         _fillInTask(updatedTask, taskNumber, taskNumber)
+        
     }
 
     const addTaskToList = ()=>{
@@ -353,6 +378,9 @@ const DOMManip = (()=>{
         getElement('#add-task-container').remove();
         _fillInTask(newTask, taskNumber, taskNumber);
         _displayTaskInput();
+        if(!getElement('#today-toggle').classList.contains('closed')){
+            _displayTodaySide();
+        }
     }
 
     const _displayConfirmCancel = ()=>{
@@ -380,7 +408,7 @@ const DOMManip = (()=>{
 
     const displayEditProject = (e)=>{
         const projectNumber = _getProjectNumber();
-        const projecTitle = projectFunctions.getAllProjects()[projectNumber].getTitle();
+        const projecTitle = projectFunctions.getAllProjects()[projectNumber].getName();
         const titleWrapper = getElement('.project-title-wrapper');
 
         const projectTitleInput = _makeNewElement('input', `project-${projectNumber}-title-input`, 'title-edit', '', {type:'text'}, {value:projecTitle}, {'data-project':projectNumber});
@@ -495,18 +523,6 @@ const DOMManip = (()=>{
         _displayTaskInput();
     }
 
-    const _getTodaysTasks = ()=>{
-        let todaysTasks = [];
-        projectFunctions.getAllProjects().forEach(proj=>{            
-            proj.tasks.forEach(task=>{
-                if(isToday(parse (task.getDate(), 'MM/dd/yyyy', new Date() ))){
-                    todaysTasks.push(task)
-                };
-            })
-        })
-        return todaysTasks;
-    }
-
     const showToday = (e)=>{
         _markSelectedProject(e);
 
@@ -546,6 +562,7 @@ const DOMManip = (()=>{
         setTimeout(_fixStartingAnimations, 1);
         EventHandler.initStartingListeners();
         projectFunctions.loadProjects();
+        _displayTodaySide();
         _displayProjects();
         EventHandler.activateSides();
         getElement('#todays-todo-side').click();

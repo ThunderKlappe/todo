@@ -1,5 +1,7 @@
 import { projectFunctions } from ".";
 import EventHandler from "./EventHandler";
+//import toDate from "date-fns/toDate";
+import { toDate, format, parseISO, subDays } from "date-fns";
 
 const DOMManip = (()=>{
     const getElement = (selector)=>document.querySelector(selector)
@@ -186,7 +188,7 @@ const DOMManip = (()=>{
         const addTaskContainer = _makeNewElement('div', 'add-task-container', 'input-container');
         const addTaskName = _makeNewElement('input', 'add-task-name-input', 'add-task-info','',{type:'text'}, {value:'Task Name'});
         const addTaskDescription = _makeNewElement('input', 'add-task-description-input', 'add-task-info','',{type:'text'}, {value:'Task Description'});
-        const addTaskDate = _makeNewElement('input', 'add-task-date-input', 'add-task-info','Due Date',{type:'date'});
+        const addTaskDate = _makeNewElement('input', 'add-task-date-input', 'add-task-info','Due Date',{type:'date'},{min:subDays(new Date(), 1).toISOString().split('T')[0]});
         const addTaskPriority = _makeNewElement('select', 'add-task-priority-input', 'add-task-info','');
         const addTaskPriorityDefault = _makeNewElement('option','','','Priority', {value:0} );
         const addTaskPriorityLow = _makeNewElement('option','','','Low', {value:'Low'},{style:'background-color:#E1ADAD'});
@@ -225,7 +227,7 @@ const DOMManip = (()=>{
         }
         return {name:formInfo[0].value,
                 description: formInfo[1].value,
-                date: formInfo[2].value,
+                date: (formInfo[2].value ? format(toDate(parseISO(formInfo[2].value)),'MM/dd/yyyy') : ''),
                 priority: formInfo[3].value,
                 project: projectNumber}
         
@@ -279,7 +281,7 @@ const DOMManip = (()=>{
         newTaskEditButton.appendChild(newTaskEditIcon);
         newTaskEditButton.appendChild(newTaskEditText);
         newTaskContainer.appendChild(newTaskEditButton);
-        _insertAfter(newTaskContainer, (taskNumber == 0)?tasksContainer.childNodes[taskNumber]:tasksContainer.childNodes[taskNumber-1]);
+        _insertAfter(newTaskContainer, tasksContainer.childNodes[taskNumber]);
         EventHandler.activateEditButton(newTaskEditButton);
     }
 

@@ -10,18 +10,22 @@ const dataStorage = (()=>{
     }
 
     const loadData = ()=>{
-        const loadedData = JSON.parse(localStorage.getItem('Projects'))
-        const returnData = [];
-        loadedData.forEach(ele => {
-            const loadProjectTitle = ele.title;
-            const loadProjectsTasks = [];
-            ele.tasks.forEach(task=>{
-                loadProjectsTasks.push(new Task(task.name, task.description, task.dueDate, task.priority, task.notes, task.project))
+        
+        if(localStorage.getItem('Projects')){
+            const loadedData = JSON.parse(localStorage.getItem('Projects'))
+            const returnData = [];
+            loadedData.forEach(ele => {
+                const loadProjectTitle = ele.title;
+                const loadProjectsTasks = [];
+                ele.tasks.forEach(task=>{
+                    loadProjectsTasks.push(new Task(task.name, task.description, task.dueDate, task.priority, task.notes, task.project))
+                })
+                const loadProjectCompleted = ele.completed;
+                returnData.push(new Project(loadProjectTitle, loadProjectsTasks, loadProjectCompleted))
             })
-            const loadProjectCompleted = ele.completed;
-            returnData.push(new Project(loadProjectTitle, loadProjectsTasks, loadProjectCompleted))
-        })
-        return returnData;
+            return returnData;
+        }
+        else return [];
     }
 
     const clearData = ()=>{

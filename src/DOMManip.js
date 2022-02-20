@@ -1,8 +1,7 @@
 import { projectFunctions } from ".";
 import EventHandler from "./EventHandler";
 import { toDate, format, parseISO, subDays, isToday, parse } from "date-fns";
-import { Project } from "./Project.js";
-import { Task } from "./Task.js"
+import dataStorage from "./dataStorage";
 
 const DOMManip = (()=>{
     const getElement = (selector)=>document.querySelector(selector)
@@ -222,13 +221,12 @@ const DOMManip = (()=>{
             type = 'task';
         }
         if(e.target.classList.contains('closed')){
-            e.target.classList.remove('closed')
             _revealArray(e.target.parentElement.parentElement, array, type);
             EventHandler.activateSides();
         }else{
-            e.target.classList.add('closed');
             _removeSubElements(e.target.parentElement.parentElement)
         }
+        e.target.classList.toggle('closed');
 
     }
 
@@ -341,8 +339,8 @@ const DOMManip = (()=>{
         const projectNumber = task.getProject();
         const tasksContainer = getElement('.tasks-container');
 
-        const newTaskContainer = _makeNewElement('div', `project-${projectNumber}-task-${taskNumber}-container`, 'task-container', '', {'data-priority':task.getPriority()},{"data-task":taskNumber});
-        const newTaskCheckbox = _makeNewElement('input', `project-${projectNumber}-task-${taskNumber}-checkbox`, 'task-checkbox', '', {type:'checkbox'}, {'data-project':projectNumber}, {'data-task':taskNumber});
+        const newTaskContainer = _makeNewElement('div', `project-${projectNumber}-task-${taskNumber}-container`, `task-container ${task.getComplete() ? 'complete': ''}`, '', {'data-priority':task.getPriority()},{"data-task":taskNumber}, {"data-project":projectNumber});
+        const newTaskCheckbox = _makeNewElement('input', `project-${projectNumber}-task-${taskNumber}-checkbox`, `task-checkbox`, '', {type:'checkbox'}, {'data-project':projectNumber}, {'data-task':taskNumber});
         const newTaskName = _makeNewElement('div', `project-${projectNumber}-task-${taskNumber}-name`, 'task-name task-info', task.getName());
         const newTaskDescription = _makeNewElement('div', `project-${projectNumber}-task-${taskNumber}-description`, 'task-description task-info', task.getDescription());
         const newTaskDate = _makeNewElement('div', `project-${projectNumber}-task-${taskNumber}-date`, 'task-date task-info', task.getDate());
@@ -359,6 +357,11 @@ const DOMManip = (()=>{
         newTaskContainer.appendChild(newTaskEditButton);
         _insertAfter(newTaskContainer,tasksContainer.childNodes[index]);
         EventHandler.activateEditButton(newTaskEditButton);
+        EventHandler.activateCheckbox(index)
+        if(task.getComplete()){
+            newTaskCheckbox.setAttribute('checked','checked')
+        }
+        
     }
 
     const updateTaskList = (taskNumber)=>{
@@ -404,6 +407,13 @@ const DOMManip = (()=>{
         confirmContainer.appendChild(cancelProjectButton);
 
         projectButtonContainer.appendChild(confirmContainer);
+    }
+
+    const toggleTaskComplete = (e) =>{
+        const selectedTask = e.currentTarget.parentElement;
+
+        projectFunctions.toggleTaskComplete(e);
+        selectedTask.classList.toggle('complete')
     }
 
     const displayEditProject = (e)=>{
@@ -571,7 +581,7 @@ const DOMManip = (()=>{
     return {getElement, getElements,checkNewProject, setupNewProject, cancelNewProject,
          getNewProjInfo, updateProjectList, expandToggle, showProject, displayDeleteProject,
           getTaskInfo, checkNewTask, addTaskToList, displayEditProject, displayEditTask, 
-          updateTaskList, cancelEdit, cancelProjectEdit, showToday, startPage}
+          updateTaskList, cancelEdit, cancelProjectEdit, showToday, startPage, toggleTaskComplete}
 })();
 
 export default DOMManip;

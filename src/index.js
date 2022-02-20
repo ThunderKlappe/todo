@@ -1,11 +1,10 @@
 import './style.css'
 import DOMManip from './DOMManip';
-import EventHandler from './EventHandler';
-import Task from './Task.js'
+import { Task } from './Task'
 import { Project } from './Project';
 import dataStorage from './dataStorage';
 
-const projectFunctions = (()=>{
+export const projectFunctions = (()=>{
 
     let _allProjects = [];
 
@@ -27,7 +26,6 @@ const projectFunctions = (()=>{
                 newTaskInfo.date, newTaskInfo.priority, '', newTaskInfo.project, newTaskInfo.number));
             DOMManip.addTaskToList();
             dataStorage.saveData();
-            console.log(_allProjects);
         }
     }
     const confirmProjectEdit = (e)=>{
@@ -38,7 +36,6 @@ const projectFunctions = (()=>{
             _allProjects[projectNumber].setTitle(editTitle);
             DOMManip.updateProjectList();
             dataStorage.saveData();
-
         }
     }
     
@@ -61,15 +58,27 @@ const projectFunctions = (()=>{
         DOMManip.showProject();
         dataStorage.saveData();
     }
+    const toggleTaskComplete =(e)=>{
+        const selectedTask = e.currentTarget.parentElement;
+        const projectNumber = selectedTask.dataset.project;
+        const taskNumber = selectedTask.dataset.task;
+        _allProjects[projectNumber].tasks[taskNumber].toggleComplete();
+        dataStorage.saveData();
+        console.log(_allProjects)
+        console.log(JSON.parse(localStorage.getItem('Projects')))
+    }
+    
 
     const getAllProjects = ()=>{
         return _allProjects.map(ele=>ele);
     }
     const loadProjects = ()=>{
         _allProjects = dataStorage.loadData();
+
     }
 
-    return{addProject, addTask, confirmProjectEdit, confirmTaskEdit, deleteProject, getAllProjects, loadProjects}
+    return {addProject, addTask, confirmProjectEdit, confirmTaskEdit, deleteProject, toggleTaskComplete,
+            getAllProjects, loadProjects}
 
 })();
 
@@ -77,7 +86,4 @@ const initWebsite = (()=>{
     DOMManip.startPage();
 })();
 
-
-
-export {projectFunctions};
 

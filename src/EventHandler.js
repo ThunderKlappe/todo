@@ -1,5 +1,5 @@
 import DOMManip from "./DOMManip";
-import { projectFunctions } from "./index.js";
+import { projectFunctions } from "./index";
 
 const EventHandler = (()=>{
     
@@ -44,6 +44,9 @@ const EventHandler = (()=>{
         button.removeEventListener('click', projectFunctions.confirmTaskEdit);
         button.addEventListener('click', DOMManip.displayEditTask);
     }
+    const activateCheckbox = index=>{
+        DOMManip.getElements('.task-checkbox')[index].addEventListener('click', DOMManip.toggleTaskComplete)
+    }
     const activateConfirmProjectEdit = button=>{
         button.removeEventListener('click', DOMManip.displayEditProject)
         button.addEventListener('click', projectFunctions.confirmProjectEdit);
@@ -60,7 +63,7 @@ const EventHandler = (()=>{
     }
 
     return{ activateAddButton, initStartingListeners, addProjectSubmission,activateProjects,
-        activateSides, activateSides, activateProjectButtons, activateAddTaskButton,
+        activateSides, activateSides, activateProjectButtons, activateAddTaskButton, activateCheckbox,
         activateEditButton, activateConfirmProjectEdit, activateConfirmTaskEdit, activateCancelButton, activateDeleteProject};
 })();
 

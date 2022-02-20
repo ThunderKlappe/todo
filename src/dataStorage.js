@@ -1,6 +1,6 @@
-import { projectFunctions } from "./index.js";
-import { Project } from "./Project.js";
-import Task from "./Task.js";
+import { projectFunctions } from "./index";
+import { Project } from "./Project";
+import { Task } from "./Task";
 
 
 const dataStorage = (()=>{
@@ -18,7 +18,7 @@ const dataStorage = (()=>{
                 const loadProjectTitle = ele.name;
                 const loadProjectsTasks = [];
                 ele.tasks.forEach(task=>{
-                    loadProjectsTasks.push(new Task(task.name, task.description, task.dueDate, task.priority, task.notes, task.project))
+                    loadProjectsTasks.push(new Task(task.name, task.description, task.dueDate, task.priority, task.notes, task.project, task.number, task.completed))
                 })
                 const loadProjectCompleted = ele.completed;
                 returnData.push(new Project(loadProjectTitle, loadProjectsTasks, loadProjectCompleted))

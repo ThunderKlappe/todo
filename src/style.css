@@ -34,7 +34,7 @@ body{
     flex: 1;
     background-color: #2f6363;
     color: #F6D7A7;
-    min-height: 90.1vh;
+    min-height: 89.3vh;
     padding-top: 28px;
     border-top-right-radius: 30px;
 }
@@ -320,6 +320,9 @@ input[type="checkbox" i] {
     width: 15px;
 }
 
+.task-container.complete{
+    background-color: #A1A1A1;
+}
 
 /* Scroll Bar */
 ::-webkit-scrollbar {

@@ -117,8 +117,9 @@ const DOMManip = (()=>{
             _makeNewElement('div', `${type}-${index}`, `${type}-side-label ${(type=='project' && elem.isSelected())?'selected' : ''}`, elem.getName(), {'data-index': `${index}`}, )))
     }
 
-    const _displayTodaySide = ()=>{
+    const displayTodaySide = ()=>{
         _revealArray(getElement('#todays-todo-side').parentElement, _getTodaysTasks(), 'task');
+        EventHandler.activateToday();
 
     }
 
@@ -440,7 +441,7 @@ const DOMManip = (()=>{
         _fillInTask(newTask, taskNumber, taskNumber);
         _displayTaskInput();
         if(!getElement('#today-toggle').classList.contains('closed')){
-            _displayTodaySide();
+            displayTodaySide();
         }
     }
 
@@ -448,12 +449,12 @@ const DOMManip = (()=>{
         const editTaskContainer = getElement(`#project-${projectNumber}-task-${taskNumber}-container`)
         const updatedTask = projectFunctions.getAllProjects()[projectNumber].tasks[taskNumber];
         editTaskContainer.remove()
-        // if(getElement('.todays-todo-side').classList.contains('selected')){
-
-        // }else
         _fillInTask(updatedTask, taskNumber, index)
+        if(getElement('#todays-todo-side').classList.contains('selected')){
+            showToday()
+        }
         if(!getElement('#today-toggle').classList.contains('closed')){
-            _displayTodaySide();
+            displayTodaySide();
         }
         
     }
@@ -585,13 +586,13 @@ const DOMManip = (()=>{
         setTimeout(_fixStartingAnimations, 1);
         EventHandler.initStartingListeners();
         projectFunctions.loadProjects();
-        _displayTodaySide();
+        displayTodaySide();
         _displayProjects();
         EventHandler.activateSides();
         getElement('#todays-todo-side').click();
     }
 
-    return {getElement, getElements,checkNewProject, setupNewProject, cancelNewProject,
+    return {getElement, getElements,checkNewProject, setupNewProject, cancelNewProject, displayTodaySide,
          getNewProjInfo, updateProjectList, expandToggle, showProject, displayDeleteProject,
           getTaskInfo, getTaskIndex, checkNewTask, addTaskToList, displayEditProject, displayEditTask, 
           updateTaskList, cancelEdit, cancelProjectEdit, showToday, startPage, toggleTaskComplete}

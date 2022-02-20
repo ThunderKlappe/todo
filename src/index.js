@@ -61,6 +61,7 @@ export const projectFunctions = (()=>{
         }
         DOMManip.updateProjectList();
         DOMManip.showProject();
+        DOMManip.displayTodaySide();
         dataStorage.saveData();
     }
     const toggleTaskComplete =(e)=>{

@@ -30,10 +30,10 @@ export const projectFunctions = (()=>{
     }
     const confirmProjectEdit = (e)=>{
         const editTitle = DOMManip.getElement('.title-edit').value;
-        const projectNumber = DOMManip.getElement('.title-edit').dataset.project;
+        const projectNumber = DOMManip.getElement('.project-container').dataset.project;
         const goodProject = DOMManip.checkNewProject(e,{name:editTitle});
         if(goodProject){
-            _allProjects[projectNumber].setTitle(editTitle);
+            _allProjects[projectNumber].setName(editTitle);
             DOMManip.updateProjectList();
             dataStorage.saveData();
         }
@@ -41,19 +41,24 @@ export const projectFunctions = (()=>{
     
     const confirmTaskEdit = (e)=>{
         const editTask = e.currentTarget.parentElement.dataset.task;
-        const editTaskInfo = DOMManip.getTaskInfo(editTask);
+        const editProject = e.currentTarget.parentElement.dataset.project
+        const index = DOMManip.getTaskIndex(e);
+        const editTaskInfo = DOMManip.getTaskInfo(editTask, editProject);
         const goodTask = DOMManip.checkNewTask(e, editTaskInfo);
         if(goodTask){
             _allProjects[editTaskInfo.project].tasks[editTask]=new Task(editTaskInfo.name, editTaskInfo.description, 
                 editTaskInfo.date, editTaskInfo.priority, '', editTaskInfo.project, editTaskInfo.number);
-            DOMManip.updateTaskList(editTask);
+            DOMManip.updateTaskList(editTask, editProject, index);
             dataStorage.saveData();
         }
     }
 
     const deleteProject = ()=>{
-        const projectNumber = DOMManip.getElement('.selected').dataset.index;
+        const projectNumber = DOMManip.getElement('.project-container').dataset.project;
         _allProjects.splice(projectNumber, 1);
+        if(DOMManip.getElement('#projects-toggle').classList.contains('closed')){
+            DOMManip.getElement('#projects-toggle').click();
+        }
         DOMManip.updateProjectList();
         DOMManip.showProject();
         dataStorage.saveData();

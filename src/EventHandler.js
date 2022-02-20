@@ -19,14 +19,17 @@ const EventHandler = (()=>{
         DOMManip.getElement('#new-proj-add-button').addEventListener('click', projectFunctions.addProject);
     }
 
+    const activateToday = ()=>{
+        DOMManip.getElement('#todays-todo-side').addEventListener('click', DOMManip.showToday);
+        DOMManip.getElements('.task-side-label').forEach(ele => ele.addEventListener('click', DOMManip.showToday))
+    }
     const activateProjects = ()=>{
         DOMManip.getElements('.project-side-label').forEach(ele=>ele.removeEventListener('click', DOMManip.showProject));
         DOMManip.getElements('.project-side-label').forEach(ele=>ele.addEventListener('click', DOMManip.showProject));
     }
     const activateSides = ()=>{
+        activateToday();
         activateProjects();
-        DOMManip.getElement('#todays-todo-side').addEventListener('click', DOMManip.showToday);
-        DOMManip.getElements('.task-side-label').forEach(ele => ele.addEventListener('click', DOMManip.showToday))
     }
     const activateProjectButtons = ()=>{
         DOMManip.getElement('.edit-button.title').addEventListener('click', DOMManip.displayEditProject);
@@ -63,7 +66,7 @@ const EventHandler = (()=>{
 
     }
 
-    return{ activateAddButton, initStartingListeners, addProjectSubmission,activateProjects,
+    return{ activateAddButton, initStartingListeners, addProjectSubmission,activateToday, activateProjects,
         activateSides, activateSides, activateProjectButtons, activateAddTaskButton, activateCheckbox,
         activateEditButton, activateConfirmProjectEdit, activateConfirmTaskEdit, activateCancelButton, activateDeleteProject};
 })();

@@ -23,6 +23,16 @@ const DOMManip = (()=>{
         return newElem;
     }
 
+    const _insertAfter = (newNode, existingNode)=> {
+        existingNode.parentNode.insertBefore(newNode, existingNode.nextSibling);
+    }
+
+    const _removeAllChildren = (element)=>{
+        for(let i = element.childNodes.length; i > 0; i--){
+            element.childNodes[i-1].remove();
+        }
+    }
+
     const _fixStartingAnimations = ()=>{
         const animatable = getElements(".fix-anim")
         animatable.forEach(ele => {
@@ -82,7 +92,7 @@ const DOMManip = (()=>{
         return todaysTasks;
     }
 
-    const _displayErrors = (e, input, type)=>{
+    const _displayErrors = (e, input)=>{
         input.forEach(ele=>{
             const error = _makeNewElement('div','','error-message', ele)
             const parent = e.currentTarget.parentElement
@@ -94,6 +104,172 @@ const DOMManip = (()=>{
     const _toggleActive = (elementID) =>{
         const element = getElement(elementID)
         element.classList.contains('active')? element.classList.remove('active') : element.classList.add('active');
+    }
+
+    const _removeSubElements = (element)=>{
+        for(let i = element.childNodes.length; i > 1; i--){
+            element.childNodes[i-1].remove();
+        }
+    }
+    const _revealArray = (parent, array, type)=>{
+        _removeSubElements(parent);
+        array.forEach((elem, index)=> parent.appendChild(
+            _makeNewElement('div', `${type}-${index}`, `${type}-side-label ${(type=='project' && elem.isSelected())?'selected' : ''}`, elem.getName(), {'data-index': `${index}`}, )))
+    }
+
+    const _displayTodaySide = ()=>{
+        _revealArray(getElement('#todays-todo-side').parentElement, _getTodaysTasks(), 'task');
+
+    }
+
+    const _displayProjects = ()=>{
+        _revealArray(getElement('#projects-side').parentElement, projectFunctions.getAllProjects(), 'project');
+    }
+
+    const _getProjectNumber = ()=>{
+        if(getElement('#projects-toggle').classList.contains('closed')){
+            return getElement('.project-container').dataset.project;
+        }else{
+            return getElement('.selected').dataset.index;
+        }
+    }
+
+    const _displayTitle = ()=>{
+        const projectNumber = _getProjectNumber();
+        const currentProject = projectFunctions.getAllProjects()[projectNumber];
+        const titleWrapper = getElement('.project-title-wrapper');
+        const titleButtonContainer = _makeNewElement('div', `project-${projectNumber}-title-button-container`, 'button-container project');
+        const projectTitle = _makeNewElement('div', `project-${projectNumber}-title`, 'project-title', `${currentProject.getName()}`);
+        
+        const editTitleButton = _makeNewElement('button', `project-${projectNumber}-edit-button`, 'edit-button title');
+        const editTitleIcon = _makeNewElement('i', '', 'fa-solid fa-pencil edit-icon');
+        const editTitleText =_makeNewElement('span', '', 'edit-text', 'Edit Title')
+        editTitleButton.appendChild(editTitleIcon);
+        editTitleButton.appendChild(editTitleText);
+
+        const deleteProjectButton = _makeNewElement('button', `project-${projectNumber}-delete-button`, 'edit-button delete');
+        const deleteProjectIcon = _makeNewElement('i', '', 'fa-solid fa-trash edit-icon');
+        const deleteProjectText =_makeNewElement('span', '', 'edit-text', 'Delete Project')
+        deleteProjectButton.appendChild(deleteProjectIcon);
+        deleteProjectButton.appendChild(deleteProjectText);
+
+        titleButtonContainer.appendChild(editTitleButton)
+        titleButtonContainer.appendChild(deleteProjectButton)
+
+        if(titleWrapper.childNodes.length >0){
+            _removeAllChildren(titleWrapper)
+        }
+        titleWrapper.appendChild(projectTitle);
+        titleWrapper.appendChild(titleButtonContainer);
+    }
+
+    const _markSelectedProject = (e)=>{
+        if(e){
+            if(e.currentTarget.classList.contains('project-side-label')){
+                getElements(".project-side-label").forEach(ele=>ele.classList.remove('selected'));
+                getElement('#todays-todo-side').classList.remove('selected');
+                projectFunctions.getAllProjects().forEach(proj => proj.markSelected(false));
+                projectFunctions.getAllProjects()[e.target.dataset.index].markSelected(true);
+                e.target.classList.add('selected');
+            }
+            else if(e.currentTarget.id == 'todays-todo-side' || e.currentTarget.classList.contains('task-side-label')){
+                getElements(".project-side-label").forEach(ele=>ele.classList.remove('selected'));
+                projectFunctions.getAllProjects().forEach(proj => proj.markSelected(false));
+                getElement('#todays-todo-side').classList.add('selected');
+            }
+        }
+        else{
+            getElements(".project-side-label").forEach(ele=>ele.classList.remove('selected'));
+            getElement('#todays-todo-side').classList.remove('selected');
+            projectFunctions.getAllProjects().forEach(proj => proj.markSelected(false));
+            projectFunctions.getAllProjects()[0].markSelected(true);
+            getElements('.project-side-label')[0].classList.add('selected');
+        }
+    }
+
+    const getTaskIndex = (e)=>{
+        return Array.from(e.currentTarget.parentNode.parentNode.children).indexOf(e.currentTarget.parentNode) - 1;
+    }
+
+    const _displayTaskInput = ()=>{
+        const projectContainer = getElement('.project-container');
+        const addTaskContainer = _makeNewElement('div', 'add-task-container', 'input-container');
+        const addTaskName = _makeNewElement('input', 'add-task-name-input', 'add-task-info','',{type:'text'}, {value:'Task Name'});
+        const addTaskDescription = _makeNewElement('input', 'add-task-description-input', 'add-task-info','',{type:'text'}, {value:'Task Description'});
+        const addTaskDate = _makeNewElement('input', 'add-task-date-input', 'add-task-info','Due Date',{type:'date'},{min:subDays(new Date(), 1).toISOString().split('T')[0]});
+        const addTaskPriority = _makeNewElement('select', 'add-task-priority-input', 'add-task-info','');
+        const addTaskPriorityDefault = _makeNewElement('option','','','Priority', {value:0} );
+        const addTaskPriorityLow = _makeNewElement('option','','','Low', {value:'Low'},{style:'background-color:#E1ADAD'});
+        const addTaskPriorityMedium = _makeNewElement('option','','','Medium', {value:"Medium"}, {style:'background-color:#EFEF38'});
+        const addTaskPriorityHigh = _makeNewElement('option','','','High', {value:"High"}, {style:'background-color:#9DCD8D'});
+        const addTaskButton = _makeNewElement('button', 'add-task-button', 'add-button', 'Add New Task');
+
+        addTaskPriority.appendChild(addTaskPriorityDefault);
+        addTaskPriority.appendChild(addTaskPriorityLow);
+        addTaskPriority.appendChild(addTaskPriorityMedium);
+        addTaskPriority.appendChild(addTaskPriorityHigh);
+
+        addTaskContainer.appendChild(addTaskName);
+        addTaskContainer.appendChild(addTaskDescription);
+        addTaskContainer.appendChild(addTaskDate);
+        addTaskContainer.appendChild(addTaskPriority);
+        addTaskContainer.appendChild(addTaskButton);
+
+        projectContainer.appendChild(addTaskContainer);
+        
+        EventHandler.activateAddTaskButton();
+    }
+
+    const _fillInTask = (task, taskNumber, index)=>{
+        const projectNumber = task.getProject();
+        const tasksContainer = getElement('.tasks-container');
+
+        const newTaskContainer = _makeNewElement('div', `project-${projectNumber}-task-${taskNumber}-container`, `task-container ${task.getComplete() ? 'complete': ''}`, '', {'data-priority':task.getPriority()},{"data-task":taskNumber}, {"data-project":projectNumber});
+        const newTaskCheckbox = _makeNewElement('input', `project-${projectNumber}-task-${taskNumber}-checkbox`, `task-checkbox`, '', {type:'checkbox'}, {'data-project':projectNumber}, {'data-task':taskNumber});
+        const newTaskName = _makeNewElement('div', `project-${projectNumber}-task-${taskNumber}-name`, 'task-name task-info', task.getName());
+        const newTaskDescription = _makeNewElement('div', `project-${projectNumber}-task-${taskNumber}-description`, 'task-description task-info', task.getDescription());
+        const newTaskDate = _makeNewElement('div', `project-${projectNumber}-task-${taskNumber}-date`, 'task-date task-info', task.getDate());
+        const newTaskEditButton = _makeNewElement('button', `project-${projectNumber}-task-${taskNumber}-edit-button`, 'edit-button');
+        const newTaskEditIcon = _makeNewElement('i', '', 'fa-solid fa-pencil edit-icon');
+        const newTaskEditText =_makeNewElement('span', '', 'edit-text', 'Edit Task')
+
+        newTaskContainer.appendChild(newTaskCheckbox);
+        newTaskContainer.appendChild(newTaskName);
+        newTaskContainer.appendChild(newTaskDescription);
+        newTaskContainer.appendChild(newTaskDate);
+        newTaskEditButton.appendChild(newTaskEditIcon);
+        newTaskEditButton.appendChild(newTaskEditText);
+        newTaskContainer.appendChild(newTaskEditButton);
+        _insertAfter(newTaskContainer,tasksContainer.childNodes[index]);
+        EventHandler.activateEditButton(newTaskEditButton);
+        EventHandler.activateCheckbox(index)
+        if(task.getComplete()){
+            newTaskCheckbox.setAttribute('checked','checked')
+        }
+        
+    }
+
+    const _displayConfirmCancel = ()=>{
+        const projectButtonContainer = getElement('.button-container');
+        const projectNumber = _getProjectNumber();
+        const confirmContainer = _makeNewElement('div', `project-${projectNumber}-delete-button-container`, 'button-container concan');
+       
+        const confirmProjectButton = _makeNewElement('button', `project-${projectNumber}-confirm-delete-button`, 'edit-button confirm');
+        const confirmProjectIcon = _makeNewElement('i', '', 'fa-solid fa-check edit-icon');
+        const confirmProjectText =_makeNewElement('span', '', 'edit-text', 'Confirm')
+        confirmProjectButton.appendChild(confirmProjectIcon);
+        confirmProjectButton.appendChild(confirmProjectText);
+
+        const cancelProjectButton = _makeNewElement('button', `project-${projectNumber}-cancel-delete-button`, 'edit-button cancel');
+        const cancelProjectIcon = _makeNewElement('i', '', 'fa-solid fa-xmark edit-icon');
+        const cancelProjectText =_makeNewElement('span', '', 'edit-text', 'Cancel')
+        cancelProjectButton.appendChild(cancelProjectIcon);
+        cancelProjectButton.appendChild(cancelProjectText);
+
+        confirmContainer.appendChild(confirmProjectButton);
+        confirmContainer.appendChild(cancelProjectButton);
+
+        projectButtonContainer.appendChild(confirmContainer);
     }
 
     const setupNewProject = ()=>{
@@ -128,7 +304,7 @@ const DOMManip = (()=>{
             errorMessages.push('Please enter a title for the project');
         }
         if(errorMessages.length > 0){
-            _displayErrors(e, errorMessages, 'project');
+            _displayErrors(e, errorMessages);
             return false;
         }else{
             return true;
@@ -136,61 +312,6 @@ const DOMManip = (()=>{
 
     }
 
-
-    const _removeAllChildren = (element)=>{
-        for(let i = element.childNodes.length; i > 0; i--){
-            element.childNodes[i-1].remove();
-        }
-    }
-
-    const _removeSubElements = (element)=>{
-        for(let i = element.childNodes.length; i > 1; i--){
-            element.childNodes[i-1].remove();
-        }
-    }
-    const _revealArray = (parent, array, type)=>{
-        _removeSubElements(parent);
-        array.forEach((elem, index)=> parent.appendChild(
-            _makeNewElement('div', `${type}-${index}`, `${type}-side-label ${(type=='project' && elem.isSelected())?'selected' : ''}`, elem.getName(), {'data-index': `${index}`}, )))
-    }
-
-    const _displayTodaySide = ()=>{
-        _revealArray(getElement('#todays-todo-side').parentElement, _getTodaysTasks(), 'task');
-
-    }
-
-    const _displayProjects = ()=>{
-        _revealArray(getElement('#projects-side').parentElement, projectFunctions.getAllProjects(), 'project');
-    }
-
-    const _displayTitle = ()=>{
-        const projectNumber = _getProjectNumber();
-        const currentProject = projectFunctions.getAllProjects()[projectNumber];
-        const titleWrapper = getElement('.project-title-wrapper');
-        const titleButtonContainer = _makeNewElement('div', `project-${projectNumber}-title-button-container`, 'button-container project');
-        const projectTitle = _makeNewElement('div', `project-${projectNumber}-title`, 'project-title', `${currentProject.getName()}`);
-        
-        const editTitleButton = _makeNewElement('button', `project-${projectNumber}-edit-button`, 'edit-button title');
-        const editTitleIcon = _makeNewElement('i', '', 'fa-solid fa-pencil edit-icon');
-        const editTitleText =_makeNewElement('span', '', 'edit-text', 'Edit Title')
-        editTitleButton.appendChild(editTitleIcon);
-        editTitleButton.appendChild(editTitleText);
-
-        const deleteProjectButton = _makeNewElement('button', `project-${projectNumber}-delete-button`, 'edit-button delete');
-        const deleteProjectIcon = _makeNewElement('i', '', 'fa-solid fa-trash edit-icon');
-        const deleteProjectText =_makeNewElement('span', '', 'edit-text', 'Delete Project')
-        deleteProjectButton.appendChild(deleteProjectIcon);
-        deleteProjectButton.appendChild(deleteProjectText);
-
-        titleButtonContainer.appendChild(editTitleButton)
-        titleButtonContainer.appendChild(deleteProjectButton)
-
-        if(titleWrapper.childNodes.length >0){
-            _removeAllChildren(titleWrapper)
-        }
-        titleWrapper.appendChild(projectTitle);
-        titleWrapper.appendChild(titleButtonContainer);
-    }
     const updateProjectList = ()=>{
         if(getElement('#new-proj-input-container')){
             getElement("#new-proj-input-container").remove();
@@ -206,214 +327,6 @@ const DOMManip = (()=>{
             EventHandler.activateAddButton();
             EventHandler.activateProjects();
         }
-    }
-
-    const expandToggle = (e)=>{
-        let array = [];
-        let type = '';
-        let parent = '';
-        if(e.target.parentElement.id == 'projects-side')
-        {
-            array = projectFunctions.getAllProjects();
-            type = 'project';
-        }else{
-            array = _getTodaysTasks();
-            type = 'task';
-        }
-        if(e.target.classList.contains('closed')){
-            _revealArray(e.target.parentElement.parentElement, array, type);
-            EventHandler.activateSides();
-        }else{
-            _removeSubElements(e.target.parentElement.parentElement)
-        }
-        e.target.classList.toggle('closed');
-
-    }
-
-    const _markSelectedProject = (e)=>{
-        if(e.currentTarget.classList.contains('project-side-label')){
-            getElements(".project-side-label").forEach(ele=>ele.classList.remove('selected'));
-            getElement('#todays-todo-side').classList.remove('selected');
-            projectFunctions.getAllProjects().forEach(proj => proj.markSelected(false));
-            projectFunctions.getAllProjects()[e.target.dataset.index].markSelected(true);
-            e.target.classList.add('selected');
-        }
-        else if(e.currentTarget.id == 'todays-todo-side'){
-            getElements(".project-side-label").forEach(ele=>ele.classList.remove('selected'));
-            projectFunctions.getAllProjects().forEach(proj => proj.markSelected(false));
-            getElement('#todays-todo-side').classList.add('selected');
-        }
-        else{
-            getElements(".project-side-label").forEach(ele=>ele.classList.remove('selected'));
-            getElement('#todays-todo-side').classList.remove('selected');
-            projectFunctions.getAllProjects().forEach(proj => proj.markSelected(false));
-            projectFunctions.getAllProjects()[0].markSelected(true);
-            getElements('.project-side-label')[0].classList.add('selected');
-        }
-    }
-
-    const _displayTaskInput = ()=>{
-        const projectContainer = getElement('.project-container');
-        const addTaskContainer = _makeNewElement('div', 'add-task-container', 'input-container');
-        const addTaskName = _makeNewElement('input', 'add-task-name-input', 'add-task-info','',{type:'text'}, {value:'Task Name'});
-        const addTaskDescription = _makeNewElement('input', 'add-task-description-input', 'add-task-info','',{type:'text'}, {value:'Task Description'});
-        const addTaskDate = _makeNewElement('input', 'add-task-date-input', 'add-task-info','Due Date',{type:'date'},{min:subDays(new Date(), 1).toISOString().split('T')[0]});
-        const addTaskPriority = _makeNewElement('select', 'add-task-priority-input', 'add-task-info','');
-        const addTaskPriorityDefault = _makeNewElement('option','','','Priority', {value:0} );
-        const addTaskPriorityLow = _makeNewElement('option','','','Low', {value:'Low'},{style:'background-color:#E1ADAD'});
-        const addTaskPriorityMedium = _makeNewElement('option','','','Medium', {value:"Medium"}, {style:'background-color:#EFEF38'});
-        const addTaskPriorityHigh = _makeNewElement('option','','','High', {value:"High"}, {style:'background-color:#9DCD8D'});
-        const addTaskButton = _makeNewElement('button', 'add-task-button', 'add-button', 'Add New Task');
-
-        addTaskPriority.appendChild(addTaskPriorityDefault);
-        addTaskPriority.appendChild(addTaskPriorityLow);
-        addTaskPriority.appendChild(addTaskPriorityMedium);
-        addTaskPriority.appendChild(addTaskPriorityHigh);
-
-        addTaskContainer.appendChild(addTaskName);
-        addTaskContainer.appendChild(addTaskDescription);
-        addTaskContainer.appendChild(addTaskDate);
-        addTaskContainer.appendChild(addTaskPriority);
-        addTaskContainer.appendChild(addTaskButton);
-
-        projectContainer.appendChild(addTaskContainer);
-        
-        EventHandler.activateAddTaskButton();
-    }
-    
-    const _getProjectNumber = ()=>{
-        return getElement('.selected').dataset.index;
-
-    }
-
-    const getTaskInfo = (index)=>{
-        let formInfo;
-        let taskNumber;
-        const projectNumber = _getProjectNumber();
-        if(index == undefined){
-            formInfo = getElements('.add-task-info');
-            taskNumber = projectFunctions.getAllProjects()[projectNumber].tasks.length;
-        }else{
-            formInfo = getElements(`#project-${projectNumber}-task-${index}-container .edit-task-info`)
-            taskNumber = index;
-        }
-        return {name:formInfo[0].value,
-                description: formInfo[1].value,
-                date: (formInfo[2].value ? format(toDate(parseISO(formInfo[2].value)),'MM/dd/yyyy') : ''),
-                priority: formInfo[3].value,
-                project: projectNumber,
-                number:taskNumber
-            }
-        
-    }
-
-    const checkNewTask = (e, task)=>{
-        let errorMessages = [];
-        if(task.name == ''){
-            errorMessages.push('Please enter a name for the task');
-        }
-        if(task.description == ''){
-            errorMessages.push('Please enter a description for the task');
-        }
-        if(task.date == ''){
-            errorMessages.push('Please enter a due date for the task');
-        }
-        if(task.priority == 0){
-            errorMessages.push('Please enter a priority level for the task');
-        }
-
-        if(errorMessages.length > 0){
-            _displayErrors(e, errorMessages, 'task');
-            return false;
-        }else{
-            return true;
-        }
-
-    }
-
-    const _insertAfter = (newNode, existingNode)=> {
-        existingNode.parentNode.insertBefore(newNode, existingNode.nextSibling);
-    }
-
-    const _fillInTask = (task, taskNumber, index)=>{
-        const projectNumber = task.getProject();
-        const tasksContainer = getElement('.tasks-container');
-
-        const newTaskContainer = _makeNewElement('div', `project-${projectNumber}-task-${taskNumber}-container`, `task-container ${task.getComplete() ? 'complete': ''}`, '', {'data-priority':task.getPriority()},{"data-task":taskNumber}, {"data-project":projectNumber});
-        const newTaskCheckbox = _makeNewElement('input', `project-${projectNumber}-task-${taskNumber}-checkbox`, `task-checkbox`, '', {type:'checkbox'}, {'data-project':projectNumber}, {'data-task':taskNumber});
-        const newTaskName = _makeNewElement('div', `project-${projectNumber}-task-${taskNumber}-name`, 'task-name task-info', task.getName());
-        const newTaskDescription = _makeNewElement('div', `project-${projectNumber}-task-${taskNumber}-description`, 'task-description task-info', task.getDescription());
-        const newTaskDate = _makeNewElement('div', `project-${projectNumber}-task-${taskNumber}-date`, 'task-date task-info', task.getDate());
-        const newTaskEditButton = _makeNewElement('button', `project-${projectNumber}-task-${taskNumber}-edit-button`, 'edit-button');
-        const newTaskEditIcon = _makeNewElement('i', '', 'fa-solid fa-pencil edit-icon');
-        const newTaskEditText =_makeNewElement('span', '', 'edit-text', 'Edit Task')
-
-        newTaskContainer.appendChild(newTaskCheckbox);
-        newTaskContainer.appendChild(newTaskName);
-        newTaskContainer.appendChild(newTaskDescription);
-        newTaskContainer.appendChild(newTaskDate);
-        newTaskEditButton.appendChild(newTaskEditIcon);
-        newTaskEditButton.appendChild(newTaskEditText);
-        newTaskContainer.appendChild(newTaskEditButton);
-        _insertAfter(newTaskContainer,tasksContainer.childNodes[index]);
-        EventHandler.activateEditButton(newTaskEditButton);
-        EventHandler.activateCheckbox(index)
-        if(task.getComplete()){
-            newTaskCheckbox.setAttribute('checked','checked')
-        }
-        
-    }
-
-    const updateTaskList = (taskNumber)=>{
-        const projectNumber = _getProjectNumber();
-        const editTaskContainer = getElement(`#project-${projectNumber}-task-${taskNumber}-container`)
-        const updatedTask = projectFunctions.getAllProjects()[projectNumber].tasks[taskNumber];
-        editTaskContainer.remove()
-        _fillInTask(updatedTask, taskNumber, taskNumber)
-        
-    }
-
-    const addTaskToList = ()=>{
-        const projectNumber = _getProjectNumber();
-        const taskNumber = projectFunctions.getAllProjects()[projectNumber].tasks.length-1;
-        const newTask = projectFunctions.getAllProjects()[projectNumber].tasks[taskNumber];
-
-        getElement('#add-task-container').remove();
-        _fillInTask(newTask, taskNumber, taskNumber);
-        _displayTaskInput();
-        if(!getElement('#today-toggle').classList.contains('closed')){
-            _displayTodaySide();
-        }
-    }
-
-    const _displayConfirmCancel = ()=>{
-        const projectButtonContainer = getElement('.button-container');
-        const projectNumber = _getProjectNumber();
-        const confirmContainer = _makeNewElement('div', `project-${projectNumber}-delete-button-container`, 'button-container concan');
-       
-        const confirmProjectButton = _makeNewElement('button', `project-${projectNumber}-confirm-delete-button`, 'edit-button confirm');
-        const confirmProjectIcon = _makeNewElement('i', '', 'fa-solid fa-check edit-icon');
-        const confirmProjectText =_makeNewElement('span', '', 'edit-text', 'Confirm')
-        confirmProjectButton.appendChild(confirmProjectIcon);
-        confirmProjectButton.appendChild(confirmProjectText);
-
-        const cancelProjectButton = _makeNewElement('button', `project-${projectNumber}-cancel-delete-button`, 'edit-button cancel');
-        const cancelProjectIcon = _makeNewElement('i', '', 'fa-solid fa-xmark edit-icon');
-        const cancelProjectText =_makeNewElement('span', '', 'edit-text', 'Cancel')
-        cancelProjectButton.appendChild(cancelProjectIcon);
-        cancelProjectButton.appendChild(cancelProjectText);
-
-        confirmContainer.appendChild(confirmProjectButton);
-        confirmContainer.appendChild(cancelProjectButton);
-
-        projectButtonContainer.appendChild(confirmContainer);
-    }
-
-    const toggleTaskComplete = (e) =>{
-        const selectedTask = e.currentTarget.parentElement;
-
-        projectFunctions.toggleTaskComplete(e);
-        selectedTask.classList.toggle('complete')
     }
 
     const displayEditProject = (e)=>{
@@ -450,14 +363,111 @@ const DOMManip = (()=>{
         EventHandler.activateProjectButtons();
     }
 
-    const cancelEdit = (e)=>{
-        const task = e.currentTarget.parentElement.dataset.task;
-        updateTaskList(task);
+    const expandToggle = (e)=>{
+        let array = [];
+        let type = '';
+        if(e.target.parentElement.id == 'projects-side')
+        {
+            array = projectFunctions.getAllProjects();
+            type = 'project';
+        }else{
+            array = _getTodaysTasks();
+            type = 'task';
+        }
+        if(e.target.classList.contains('closed')){
+            _revealArray(e.target.parentElement.parentElement, array, type);
+            EventHandler.activateSides();
+        }else{
+            _removeSubElements(e.target.parentElement.parentElement)
+        }
+        e.target.classList.toggle('closed');
+
+    }
+
+    const getTaskInfo = (index, projectNumber)=>{
+        let formInfo;
+        let taskNumber;
+        if(!projectNumber){
+            projectNumber = _getProjectNumber();
+        }
+        if(index == undefined){
+            formInfo = getElements('.add-task-info');
+            taskNumber = projectFunctions.getAllProjects()[projectNumber].tasks.length;
+        }else{
+            formInfo = getElements(`#project-${projectNumber}-task-${index}-container .edit-task-info`)
+            taskNumber = index;
+        }
+        return {name:formInfo[0].value,
+                description: formInfo[1].value,
+                date: (formInfo[2].value ? format(toDate(parseISO(formInfo[2].value)),'MM/dd/yyyy') : ''),
+                priority: formInfo[3].value,
+                project: projectNumber,
+                number:taskNumber
+            }
+        
+    }
+
+    const checkNewTask = (e, task)=>{
+        let errorMessages = [];
+        if(task.name == ''){
+            errorMessages.push('Please enter a name for the task');
+        }
+        if(task.description == ''){
+            errorMessages.push('Please enter a description for the task');
+        }
+        if(task.date == ''){
+            errorMessages.push('Please enter a due date for the task');
+        }
+        if(task.priority == 0){
+            errorMessages.push('Please enter a priority level for the task');
+        }
+
+        if(errorMessages.length > 0){
+            _displayErrors(e, errorMessages);
+            return false;
+        }else{
+            return true;
+        }
+
+    }
+
+    const addTaskToList = ()=>{
+        const projectNumber = _getProjectNumber();
+        const taskNumber = projectFunctions.getAllProjects()[projectNumber].tasks.length-1;
+        const newTask = projectFunctions.getAllProjects()[projectNumber].tasks[taskNumber];
+
+        getElement('#add-task-container').remove();
+        _fillInTask(newTask, taskNumber, taskNumber);
+        _displayTaskInput();
+        if(!getElement('#today-toggle').classList.contains('closed')){
+            _displayTodaySide();
+        }
+    }
+
+    const updateTaskList = (taskNumber, projectNumber, index)=>{
+        const editTaskContainer = getElement(`#project-${projectNumber}-task-${taskNumber}-container`)
+        const updatedTask = projectFunctions.getAllProjects()[projectNumber].tasks[taskNumber];
+        editTaskContainer.remove()
+        // if(getElement('.todays-todo-side').classList.contains('selected')){
+
+        // }else
+        _fillInTask(updatedTask, taskNumber, index)
+        if(!getElement('#today-toggle').classList.contains('closed')){
+            _displayTodaySide();
+        }
+        
+    }
+
+    const toggleTaskComplete = (e) =>{
+        const selectedTask = e.currentTarget.parentElement;
+
+        projectFunctions.toggleTaskComplete(e);
+        selectedTask.classList.toggle('complete')
     }
 
     const displayEditTask = e=>{
         const editButton = e.currentTarget;
-        const projectNumber = _getProjectNumber()
+        const projectNumber = editButton.parentElement.dataset.project;
         const taskNumber = editButton.parentElement.dataset.task;
         const editTask = projectFunctions.getAllProjects()[projectNumber].tasks[taskNumber];
 
@@ -504,20 +514,23 @@ const DOMManip = (()=>{
 
     }
 
+    const cancelEdit = (e)=>{
+        const task = e.currentTarget.parentElement.dataset.task;
+        const project = e.currentTarget.parentElement.dataset.project;
+        const index = getTaskIndex(e);
+
+        updateTaskList(task, project, index);
+    }
+
     const showProject = (e)=>{
         _markSelectedProject(e);
         const mainDisplay = getElement('#main-display');
-
-        //this can get removed after Today's Tasks is working
-        if(mainDisplay.childNodes.length >0){
-            mainDisplay.firstChild.remove();
-        }
-        //*****
+        mainDisplay.firstChild.remove();
 
         const projectNumber = _getProjectNumber();
         const currentProject = projectFunctions.getAllProjects()[projectNumber];
 
-        const projectContainer = _makeNewElement('div', `project-${projectNumber}-container`, 'project-container');
+        const projectContainer = _makeNewElement('div', `project-${projectNumber}-container`, 'project-container', '', {'data-project':projectNumber});
         const projectTitleWrapper = _makeNewElement('div' , `project-${projectNumber}-title-wrapper`, 'project-title-wrapper');
         const tasksContainer = _makeNewElement('div', `project-${projectNumber}-tasks-container`, 'tasks-container');
         const tasksWrapper = _makeNewElement('div', `project-${projectNumber}-tasks-wrapper`, 'tasks-wrapper')
@@ -580,7 +593,7 @@ const DOMManip = (()=>{
 
     return {getElement, getElements,checkNewProject, setupNewProject, cancelNewProject,
          getNewProjInfo, updateProjectList, expandToggle, showProject, displayDeleteProject,
-          getTaskInfo, checkNewTask, addTaskToList, displayEditProject, displayEditTask, 
+          getTaskInfo, getTaskIndex, checkNewTask, addTaskToList, displayEditProject, displayEditTask, 
           updateTaskList, cancelEdit, cancelProjectEdit, showToday, startPage, toggleTaskComplete}
 })();
 

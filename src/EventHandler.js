@@ -26,6 +26,7 @@ const EventHandler = (()=>{
     const activateSides = ()=>{
         activateProjects();
         DOMManip.getElement('#todays-todo-side').addEventListener('click', DOMManip.showToday);
+        DOMManip.getElements('.task-side-label').forEach(ele => ele.addEventListener('click', DOMManip.showToday))
     }
     const activateProjectButtons = ()=>{
         DOMManip.getElement('.edit-button.title').addEventListener('click', DOMManip.displayEditProject);

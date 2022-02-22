@@ -93,7 +93,7 @@ const DOMManip = (()=>{
         let todaysTasks = [];
         projectFunctions.getAllProjects().forEach(proj=>{            
             proj.tasks.forEach(task=>{
-                if(isToday(parse (task.getDate(), "MM/dd/yyyy", new Date() ))){
+                if(isToday(parse (task.getDate(), "MM/dd/yyyy", new Date() )) && task.getComplete() == false){
                     todaysTasks.push(task);
                 }
             });
@@ -596,6 +596,13 @@ const DOMManip = (()=>{
         
         
     };
+
+    // const _refreshToday = ()=>{
+    //     if(!getElement("#today-toggle").classList.contains("closed")){
+    //         displayTodaySide();
+    //     }
+    //     showToday();
+    // };
 
     //initalizes the webpage and starts the basic listeners
     const startPage = ()=>{

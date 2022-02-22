@@ -92,6 +92,7 @@ export const projectFunctions = (()=>{
         }else{
             DOMManip.showProject(e);
         }
+        DOMManip.displayTodaySide();
         dataStorage.saveData();
     };
     

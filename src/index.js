@@ -75,8 +75,8 @@ export const projectFunctions = (()=>{
             DOMManip.getElement('#projects-toggle').click();
         }
         DOMManip.updateProjectList();
-        DOMManip.showProject();
         DOMManip.displayTodaySide();
+        DOMManip.showToday();
         dataStorage.saveData();
     }
 

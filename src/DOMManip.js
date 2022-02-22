@@ -192,8 +192,7 @@ const DOMManip = (()=>{
             getElements(".project-side-label").forEach(ele=>ele.classList.remove('selected'));
             getElement('#todays-todo-side').classList.remove('selected');
             projectFunctions.getAllProjects().forEach(proj => proj.markSelected(false));
-            projectFunctions.getAllProjects()[0].markSelected(true);
-            getElements('.project-side-label')[0].classList.add('selected');
+            getElement('#todays-todo-side').classList.add('selected');
         }
     }
 

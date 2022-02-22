@@ -23,6 +23,9 @@ const DOMManip = (()=>{
     
         return newElem;
     };
+    const removeText = (e)=>{
+        e.currentTarget.value = "";
+    };
 
     //inserts a DOM element after another element
     const _insertAfter = (newNode, existingNode)=> {
@@ -228,6 +231,7 @@ const DOMManip = (()=>{
 
         projectContainer.appendChild(addTaskContainer);
         
+        EventHandler.clearTextBox();
         EventHandler.activateAddTaskButton();
     };
 
@@ -297,7 +301,7 @@ const DOMManip = (()=>{
         newProjInputContainer.appendChild(newProjAddButton);
 
         getElement("#add-project-button-container").appendChild(newProjInputContainer);
-
+        EventHandler.clearTextBox();
         EventHandler.addProjectSubmission();
     };
     //cancels the new Project dialog
@@ -360,7 +364,7 @@ const DOMManip = (()=>{
         _removeAllChildren(projectButtonContainer, 0);
 
         _displayConfirmCancel();
-        
+
         EventHandler.activateConfirmProjectEdit(getElement(".edit-button.confirm"));
         EventHandler.activateCancelButton(getElement(".edit-button.cancel"));
     };
@@ -605,7 +609,7 @@ const DOMManip = (()=>{
         getElement("#todays-todo-side").click();
     };
 
-    return {getElement, getElements,checkNewProject, setupNewProject, cancelNewProject, displayTodaySide,
+    return {getElement, getElements,removeText, checkNewProject, setupNewProject, cancelNewProject, displayTodaySide,
             getNewProjInfo, updateProjectList, expandToggle, showProject, displayDeleteProject,
             getTaskInfo, getTaskIndex, checkNewTask, displayEditProject, displayEditTask, 
             updateTaskList, cancelEdit, cancelProjectEdit, showToday, startPage};

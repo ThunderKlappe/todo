@@ -75,7 +75,7 @@ export const projectFunctions = (()=>{
             DOMManip.getElement("#projects-toggle").click();
         }
         DOMManip.updateProjectList();
-        DOMManip.displayTodaySide();
+        DOMManip.refreshTaskSides();
         DOMManip.showToday();
         dataStorage.saveData();
     };
@@ -89,10 +89,12 @@ export const projectFunctions = (()=>{
         _allProjects[projectNumber].tasks[taskNumber].toggleComplete();
         if(DOMManip.getElement(".selected").id == "todays-todo-side"){
             DOMManip.showToday(e);
+        }else if(DOMManip.getElement(".selected").id == "overdue-todo-side"){
+            DOMManip.showOverdue(e);
         }else{
             DOMManip.showProject(e);
         }
-        DOMManip.displayTodaySide();
+        DOMManip.refreshTaskSides();
         dataStorage.saveData();
     };
     

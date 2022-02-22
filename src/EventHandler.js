@@ -32,7 +32,11 @@ const EventHandler = (()=>{
     //clicking the Today header or any of the tasks for today brings up the Today page
     const activateToday = ()=>{
         DOMManip.getElement("#todays-todo-side").addEventListener("click", DOMManip.showToday);
-        DOMManip.getElements(".task-side-label").forEach(ele => ele.addEventListener("click", DOMManip.showToday));
+        DOMManip.getElements(".task-side-label.today").forEach(ele => ele.addEventListener("click", DOMManip.showToday));
+    };
+    const activateOverdue = ()=>{
+        DOMManip.getElement("#overdue-todo-side").addEventListener("click", DOMManip.showOverdue);
+        DOMManip.getElements(".task-side-label.overdue").forEach(ele => ele.addEventListener("click", DOMManip.showOverdue));
     };
     //makes the projects clickable, maintains only one action listener on each project
     const activateProjects = ()=>{
@@ -42,6 +46,7 @@ const EventHandler = (()=>{
     //turns on all side panel pages
     const activateSides = ()=>{
         activateToday();
+        activateOverdue();
         activateProjects();
     };
     //activates the edit project buttons
@@ -85,7 +90,7 @@ const EventHandler = (()=>{
 
     };
 
-    return{ activateAddButton, initStartingListeners, addProjectSubmission,activateToday, activateProjects,
+    return{ activateAddButton, initStartingListeners, addProjectSubmission,activateToday, activateProjects, activateOverdue,
             activateSides, clearTextBox, activateProjectButtons, activateAddTaskButton, activateCheckbox,
             activateEditButton, activateConfirmProjectEdit, activateConfirmTaskEdit, activateCancelButton, activateDeleteProject};
 })();

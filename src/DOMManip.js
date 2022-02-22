@@ -1,12 +1,13 @@
 import { projectFunctions } from ".";
 import EventHandler from "./EventHandler";
 import { toDate, format, parseISO, subDays, isToday, parse } from "date-fns";
-import dataStorage from "./dataStorage";
 
 const DOMManip = (()=>{
+    //shorthand to get elements easier
     const getElement = (selector)=>document.querySelector(selector)
     const getElements = (selector)=>document.querySelectorAll(selector)
     
+    //shorthand to make a new element and add attributes to it
     const _makeNewElement = (type, id='', HTMLClass = '', text = '', ...attributes) =>{
         const newElem = document.createElement(type);
         if(id != ''){
@@ -23,16 +24,19 @@ const DOMManip = (()=>{
         return newElem;
     }
 
+    //inserts a DOM element after another element
     const _insertAfter = (newNode, existingNode)=> {
         existingNode.parentNode.insertBefore(newNode, existingNode.nextSibling);
     }
 
-    const _removeAllChildren = (element)=>{
-        for(let i = element.childNodes.length; i > 0; i--){
+    //clears out all child nodes of an element, skips as many elements as requested
+    const _removeAllChildren = (element, skip)=>{
+        for(let i = element.childNodes.length; i > skip; i--){
             element.childNodes[i-1].remove();
         }
     }
 
+    //fixes strange bug where elements animated from their default state to their css styled state
     const _fixStartingAnimations = ()=>{
         const animatable = getElements(".fix-anim")
         animatable.forEach(ele => {
@@ -40,6 +44,7 @@ const DOMManip = (()=>{
             ele.classList.remove('fix-anim')})
     }
 
+    //adds all of the starting element to the page when first loading the page
     const _makeStartingPage = ()=>{
         const header = _makeNewElement('div', 'header', '', 'To-Do List')
         document.body.appendChild(header);
@@ -80,6 +85,7 @@ const DOMManip = (()=>{
 
     }
 
+    //goes through all of the projects and if a task's due date is today, it adds that task to an array
     const _getTodaysTasks = ()=>{
         let todaysTasks = [];
         projectFunctions.getAllProjects().forEach(proj=>{            
@@ -92,6 +98,8 @@ const DOMManip = (()=>{
         return todaysTasks;
     }
 
+    //takes in an array of error messages and puts them directly above the parent of that element
+    //makes the error messages dissappear after they've been read
     const _displayErrors = (e, input)=>{
         input.forEach(ele=>{
             const error = _makeNewElement('div','','error-message', ele)
@@ -101,32 +109,31 @@ const DOMManip = (()=>{
             setTimeout(()=>error.remove(), 4000);
         })
     }
+    //toggles whether or not an element has the class "active".
     const _toggleActive = (elementID) =>{
         const element = getElement(elementID)
         element.classList.contains('active')? element.classList.remove('active') : element.classList.add('active');
     }
 
-    const _removeSubElements = (element)=>{
-        for(let i = element.childNodes.length; i > 1; i--){
-            element.childNodes[i-1].remove();
-        }
-    }
+    //puts an array of elements underneath a parent element
     const _revealArray = (parent, array, type)=>{
-        _removeSubElements(parent);
+        _removeAllChildren(parent, 1);
         array.forEach((elem, index)=> parent.appendChild(
             _makeNewElement('div', `${type}-${index}`, `${type}-side-label ${(type=='project' && elem.isSelected())?'selected' : ''}`, elem.getName(), {'data-index': `${index}`}, )))
     }
 
+    //shows the tasks that are due today on the side panel
     const displayTodaySide = ()=>{
         _revealArray(getElement('#todays-todo-side').parentElement, _getTodaysTasks(), 'task');
         EventHandler.activateToday();
 
     }
-
+    //shows all projects on the side panel
     const _displayProjects = ()=>{
         _revealArray(getElement('#projects-side').parentElement, projectFunctions.getAllProjects(), 'project');
     }
 
+    //returns what the current selected project number is
     const _getProjectNumber = ()=>{
         if(getElement('#projects-toggle').classList.contains('closed')){
             return getElement('.project-container').dataset.project;
@@ -135,6 +142,7 @@ const DOMManip = (()=>{
         }
     }
 
+    //puts the title of the project and the edit buttons at the top of the page
     const _displayTitle = ()=>{
         const projectNumber = _getProjectNumber();
         const currentProject = projectFunctions.getAllProjects()[projectNumber];
@@ -158,12 +166,13 @@ const DOMManip = (()=>{
         titleButtonContainer.appendChild(deleteProjectButton)
 
         if(titleWrapper.childNodes.length >0){
-            _removeAllChildren(titleWrapper)
+            _removeAllChildren(titleWrapper, 0)
         }
         titleWrapper.appendChild(projectTitle);
         titleWrapper.appendChild(titleButtonContainer);
     }
 
+    //highlights what project (or todays tasks) is selected. Defaults to the first project
     const _markSelectedProject = (e)=>{
         if(e){
             if(e.currentTarget.classList.contains('project-side-label')){
@@ -188,10 +197,12 @@ const DOMManip = (()=>{
         }
     }
 
+    //returns which number element a task is in a given list.
     const getTaskIndex = (e)=>{
         return Array.from(e.currentTarget.parentNode.parentNode.children).indexOf(e.currentTarget.parentNode) - 1;
     }
 
+    //adds the Add Task entry to the bottom of the project
     const _displayTaskInput = ()=>{
         const projectContainer = getElement('.project-container');
         const addTaskContainer = _makeNewElement('div', 'add-task-container', 'input-container');
@@ -221,6 +232,7 @@ const DOMManip = (()=>{
         EventHandler.activateAddTaskButton();
     }
 
+    //takes a given task and adds a DOM entry in a specific given index of the task list
     const _fillInTask = (task, taskNumber, index)=>{
         const projectNumber = task.getProject();
         const tasksContainer = getElement('.tasks-container');
@@ -250,6 +262,7 @@ const DOMManip = (()=>{
         
     }
 
+    //shows the confirm and cancel buttons for editing a project
     const _displayConfirmCancel = ()=>{
         const projectButtonContainer = getElement('.button-container');
         const projectNumber = _getProjectNumber();
@@ -273,6 +286,7 @@ const DOMManip = (()=>{
         projectButtonContainer.appendChild(confirmContainer);
     }
 
+    //displays a new project that can be selected to the side panel
     const setupNewProject = ()=>{
         _toggleActive('#add-project-button');
         _toggleActive('#add-project-button-text');
@@ -287,6 +301,7 @@ const DOMManip = (()=>{
 
         EventHandler.addProjectSubmission();
     }
+    //cancels the new Project dialog
     const cancelNewProject = ()=>{
         _toggleActive('#add-project-button');
         _toggleActive('#add-project-button-text');
@@ -295,10 +310,12 @@ const DOMManip = (()=>{
 
     }
 
+    //gets the information that was in the new project dialog
     const getNewProjInfo = ()=>{
         return {name:DOMManip.getElement('#new-proj-input').value};
     }
     
+    //checks over the information given for a project and displays error messages if there is an issue
     const checkNewProject = (e, project)=>{
         let errorMessages = [];
         if(project.name == ''){
@@ -312,7 +329,7 @@ const DOMManip = (()=>{
         }
 
     }
-
+    //updates the side panel that displays the list of all of the projects
     const updateProjectList = ()=>{
         if(getElement('#new-proj-input-container')){
             getElement("#new-proj-input-container").remove();
@@ -330,6 +347,7 @@ const DOMManip = (()=>{
         }
     }
 
+    //opens up the edit project dialog
     const displayEditProject = (e)=>{
         const projectNumber = _getProjectNumber();
         const projecTitle = projectFunctions.getAllProjects()[projectNumber].getName();
@@ -340,17 +358,19 @@ const DOMManip = (()=>{
         titleWrapper.firstElementChild.remove();
 
         const projectButtonContainer = getElement('.button-container');
-        _removeAllChildren(projectButtonContainer);
+        _removeAllChildren(projectButtonContainer, 0);
 
         _displayConfirmCancel();
         
         EventHandler.activateConfirmProjectEdit(getElement('.edit-button.confirm'));
         EventHandler.activateCancelButton(getElement('.edit-button.cancel'))
     }
+
+    //displays the confirmation of deleting a project
     const displayDeleteProject= ()=>{
         const projectNumber = _getProjectNumber()
         const projectButtonContainer = getElement('.button-container');
-        _removeAllChildren(projectButtonContainer);
+        _removeAllChildren(projectButtonContainer, 0);
 
         _displayConfirmCancel();
 
@@ -358,12 +378,14 @@ const DOMManip = (()=>{
         EventHandler.activateCancelButton(getElement('.edit-button.cancel'))
 
     }
+    //discards the edit and displays the initial project title
     const cancelProjectEdit = ()=>{
         const titleWrapper = getElement('.project-title-wrapper')
         _displayTitle();
         EventHandler.activateProjectButtons();
     }
 
+    //opens and closes the elements under the projects and today side headers when the toggle button is clicked
     const expandToggle = (e)=>{
         let array = [];
         let type = '';
@@ -379,12 +401,13 @@ const DOMManip = (()=>{
             _revealArray(e.target.parentElement.parentElement, array, type);
             EventHandler.activateSides();
         }else{
-            _removeSubElements(e.target.parentElement.parentElement)
+            _removeAllChildren(e.target.parentElement.parentElement, 1)
         }
         e.target.classList.toggle('closed');
 
     }
 
+    //returns the information given by the add task dialog
     const getTaskInfo = (index, projectNumber)=>{
         let formInfo;
         let taskNumber;
@@ -408,6 +431,7 @@ const DOMManip = (()=>{
         
     }
 
+    //checks the information given in a new or updated task and displays error messages if anything is wrong
     const checkNewTask = (e, task)=>{
         let errorMessages = [];
         if(task.name == ''){
@@ -432,23 +456,16 @@ const DOMManip = (()=>{
 
     }
 
-    const addTaskToList = ()=>{
-        const projectNumber = _getProjectNumber();
-        const taskNumber = projectFunctions.getAllProjects()[projectNumber].tasks.length-1;
-        const newTask = projectFunctions.getAllProjects()[projectNumber].tasks[taskNumber];
-
-        getElement('#add-task-container').remove();
-        _fillInTask(newTask, taskNumber, taskNumber);
-        _displayTaskInput();
-        if(!getElement('#today-toggle').classList.contains('closed')){
-            displayTodaySide();
-        }
-    }
-
+    //refreshes the task list to display a new or edited task
     const updateTaskList = (taskNumber, projectNumber, index)=>{
         const editTaskContainer = getElement(`#project-${projectNumber}-task-${taskNumber}-container`)
         const updatedTask = projectFunctions.getAllProjects()[projectNumber].tasks[taskNumber];
-        editTaskContainer.remove()
+        if(editTaskContainer){
+            editTaskContainer.remove()
+        }else{
+            getElement('#add-task-container').remove();
+            _displayTaskInput();
+        }
         _fillInTask(updatedTask, taskNumber, index)
         if(getElement('#todays-todo-side').classList.contains('selected')){
             showToday()
@@ -459,13 +476,8 @@ const DOMManip = (()=>{
         
     }
 
-    const toggleTaskComplete = (e) =>{
-        const selectedTask = e.currentTarget.parentElement;
-
-        projectFunctions.toggleTaskComplete(e);
-        selectedTask.classList.toggle('complete')
-    }
-
+    //shows the edit task dialog when the edit task button has been pressed, defaulting with the
+    //current task information
     const displayEditTask = e=>{
         const editButton = e.currentTarget;
         const projectNumber = editButton.parentElement.dataset.project;
@@ -515,6 +527,7 @@ const DOMManip = (()=>{
 
     }
 
+    //sets task back to original before edit was requested
     const cancelEdit = (e)=>{
         const task = e.currentTarget.parentElement.dataset.task;
         const project = e.currentTarget.parentElement.dataset.project;
@@ -523,6 +536,7 @@ const DOMManip = (()=>{
         updateTaskList(task, project, index);
     }
 
+    //displays a project page based on what project was selected
     const showProject = (e)=>{
         _markSelectedProject(e);
         const mainDisplay = getElement('#main-display');
@@ -547,6 +561,7 @@ const DOMManip = (()=>{
         _displayTaskInput();
     }
 
+    //shows the Today's Tasks page
     const showToday = (e)=>{
         _markSelectedProject(e);
 
@@ -581,6 +596,7 @@ const DOMManip = (()=>{
         
     }
 
+    //initalizes the webpage and starts the basic listeners
     const startPage = ()=>{
         _makeStartingPage();
         setTimeout(_fixStartingAnimations, 1);
@@ -593,9 +609,9 @@ const DOMManip = (()=>{
     }
 
     return {getElement, getElements,checkNewProject, setupNewProject, cancelNewProject, displayTodaySide,
-         getNewProjInfo, updateProjectList, expandToggle, showProject, displayDeleteProject,
-          getTaskInfo, getTaskIndex, checkNewTask, addTaskToList, displayEditProject, displayEditTask, 
-          updateTaskList, cancelEdit, cancelProjectEdit, showToday, startPage, toggleTaskComplete}
+            getNewProjInfo, updateProjectList, expandToggle, showProject, displayDeleteProject,
+            getTaskInfo, getTaskIndex, checkNewTask, displayEditProject, displayEditTask, 
+            updateTaskList, cancelEdit, cancelProjectEdit, showToday, startPage}
 })();
 
 export default DOMManip;

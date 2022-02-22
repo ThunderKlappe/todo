@@ -21,10 +21,5 @@ export class Task{
     getComplete = ()=>this.completed;
     getNumber = ()=>this.number;
 
-    setName = (newName)=>this.name = newName
-    setDescription = (newDescription)=>this.description = newDescription
-    setDueDate = (newDueDate)=>this.dueDate = newDueDate
-    setPriority = (newPriority)=>this.priority = newPriority
-    setNotes = (newNotes)=>this.notes = newNotes
     toggleComplete = ()=>this.completed = !this.completed;
 }

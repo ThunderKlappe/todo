@@ -4,11 +4,14 @@ import { Task } from "./Task";
 
 
 const dataStorage = (()=>{
+    //this takes the current array of projects and saves the contents into a JSON file in localstorage
     const saveData = ()=>{
         const allProj = projectFunctions.getAllProjects()
         localStorage.setItem('Projects', JSON.stringify(allProj))
     }
 
+    //finds the data in local storage, runs through the array and converts each entry into the appropriate
+    //project or task in order to maintain object methods. If there is no data, returns an empty array
     const loadData = ()=>{
         
         if(localStorage.getItem('Projects')){
@@ -28,11 +31,7 @@ const dataStorage = (()=>{
         else return [];
     }
 
-    const clearData = ()=>{
-        localStorage.setItem('Projects', '');
-    }
-
-    return{saveData, loadData, clearData}
+    return{saveData, loadData}
 })();
 
 export default dataStorage;

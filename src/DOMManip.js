@@ -68,6 +68,12 @@ const DOMManip = (()=>{
         overdueTodoSide.appendChild(overdueSideDropdown);
         overdueSideHeaderContainer.appendChild(overdueTodoSide);
 
+        const daysSideHeaderContainer = _makeNewElement("div", "", "side-header-container");
+        const daysTodoSide = _makeNewElement("div", "days-todo-side", "side-header days", "Days Away");
+        const daysSideDropdown = _makeNewElement("div", "days-toggle", "dropdown-toggle fix-anim closed fa-solid fa-caret-down");
+        daysTodoSide.appendChild(daysSideDropdown);
+        daysSideHeaderContainer.appendChild(daysTodoSide);
+
         const projectSideHeaderContainer = _makeNewElement("div", "", "side-header-container");
         const projectsSide = _makeNewElement("div", "projects-side", "side-header", "Projects");
         const projectSideDropdown = _makeNewElement("div", "projects-toggle", "dropdown-toggle fix-anim fa-solid fa-caret-down");
@@ -76,6 +82,7 @@ const DOMManip = (()=>{
 
         sidePanel.appendChild(todaySideHeaderContainer);
         sidePanel.appendChild(overdueSideHeaderContainer);
+        sidePanel.appendChild(daysSideHeaderContainer);
         sidePanel.appendChild(projectSideHeaderContainer);
 
         const mainDisplay = _makeNewElement("div", "main-display");
@@ -95,7 +102,8 @@ const DOMManip = (()=>{
 
     };
 
-    //goes through all of the projects and if a task's due date is today, it adds that task to an array
+    //goes through all of the projects and if a task's due date is offset by a certain days from today
+    //it adds that task to an array
     const _getTasks = (offset)=>{
         let todaysTasks = [];
         const dayRequested = format(add(toDate(new Date()),{days:offset}),"MM/dd/yyyy");
@@ -110,6 +118,7 @@ const DOMManip = (()=>{
         return todaysTasks;
     };
 
+    //gets all tasks that are due earlier than today
     const _getOverdueTasks = ()=>{
         let overdueTasks = [];
         const today = startOfDay(new Date());
@@ -153,11 +162,12 @@ const DOMManip = (()=>{
         EventHandler.activateToday();
 
     };
+    //shows the tasks that are past due on the side panel
     const _displayOverdueSide = ()=>{
         _revealArray(getElement("#overdue-todo-side").parentElement, _getOverdueTasks(), "task", "overdue");
         EventHandler.activateOverdue();
     };
-
+    //updates all of the task containing side panel categories
     const refreshTaskSides = ()=>{
         _displayOverdueSide();
         _displayTodaySide();
@@ -672,6 +682,7 @@ const DOMManip = (()=>{
         
     };
 
+    //brings up the page that shows all of the overdue tasks
     const showOverdue = (e)=>{
         _markSelectedProject(e);
 

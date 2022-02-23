@@ -10,13 +10,13 @@ const EventHandler = (()=>{
         DOMManip.getElements("input[type=\"text\" i]").forEach(ele=>ele.addEventListener("click", DOMManip.removeText, {once:true}));
 
     };
-
+    //activates the add button and the side toggles
     const activateAddButton = ()=>{
         DOMManip.getElement("#add-project-button").removeEventListener("click", DOMManip.cancelNewProject);
         DOMManip.getElement("#add-project-button").addEventListener("click", DOMManip.setupNewProject);
     };
 
-    //activates the add button and the side toggles
+    //activates the listeners for all of clickable buttons at the start of the page load
     const initStartingListeners = ()=>{
         activateAddButton();
         DOMManip.getElements(".dropdown-toggle").forEach(ele =>ele.addEventListener("click", DOMManip.expandToggle));
@@ -34,6 +34,7 @@ const EventHandler = (()=>{
         DOMManip.getElement("#todays-todo-side").addEventListener("click", DOMManip.showToday);
         DOMManip.getElements(".task-side-label.today").forEach(ele => ele.addEventListener("click", DOMManip.showToday));
     };
+    //clicking the Overdue header or any of the task that are Overdue brings up the Overdue page
     const activateOverdue = ()=>{
         DOMManip.getElement("#overdue-todo-side").addEventListener("click", DOMManip.showOverdue);
         DOMManip.getElements(".task-side-label.overdue").forEach(ele => ele.addEventListener("click", DOMManip.showOverdue));

@@ -38,6 +38,9 @@ body{
     padding-top: 28px;
     border-top-right-radius: 30px;
 }
+#side-panel > * :hover{
+    cursor: pointer;
+}
 .side-header-container{
     display: flex;
     flex-direction: column;
@@ -246,6 +249,10 @@ select{
 .task-project-info{
     font-weight: bold;
 }
+.task-project-info:hover{
+    text-decoration: underline;
+    cursor: pointer;
+}
 
 .error-message{
     font-size: 18px;
@@ -343,6 +350,10 @@ input[type="checkbox" i] {
     font-size: 20px;
     font-weight: bold;
     padding: 10px 0px 10px 100px
+}
+
+button:hover{
+    cursor:pointer;
 }
 /* Scroll Bar */
 ::-webkit-scrollbar {

@@ -19,7 +19,7 @@ const EventHandler = (()=>{
     //activates the listeners for all of clickable buttons at the start of the page load
     const initStartingListeners = ()=>{
         activateAddButton();
-        DOMManip.getElements(".dropdown-toggle").forEach(ele =>ele.addEventListener("click", DOMManip.expandToggle));
+        DOMManip.getElements(".dropdown-toggle").forEach(ele =>ele.addEventListener("click", DOMManip.expandToggle,  {capture:true}));
     };
 
     //changes the add project button to cancel adding project and activates the submit button

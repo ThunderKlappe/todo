@@ -102,6 +102,8 @@ export const projectFunctions = (()=>{
             DOMManip.showToday(e);
         }else if(DOMManip.getElement(".selected").id == "overdue-todo-side"){
             DOMManip.showOverdue(e);
+        }else if(DOMManip.getElement(".selected").id == "days-todo-side"){
+            DOMManip.changeDays();
         }else{
             DOMManip.showProject(e);
         }

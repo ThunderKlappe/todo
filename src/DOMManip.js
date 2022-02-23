@@ -156,13 +156,17 @@ const DOMManip = (()=>{
 
     //shows the tasks that are due today on the side panel
     const _displayTodaySide = ()=>{
-        _revealArray(getElement("#todays-todo-side").parentElement, _getTasks(0), "task", "today");
+        if(!getElement("#today-toggle").classList.contains("closed")){
+            _revealArray(getElement("#todays-todo-side").parentElement, _getTasks(0), "task", "today");
+        }
         EventHandler.activateToday();
 
     };
     //shows the tasks that are past due on the side panel
     const _displayOverdueSide = ()=>{
-        _revealArray(getElement("#overdue-todo-side").parentElement, _getOverdueTasks(), "task", "overdue");
+        if(!getElement("#overdue-toggle").classList.contains("closed")){
+            _revealArray(getElement("#overdue-todo-side").parentElement, _getOverdueTasks(), "task", "overdue");
+        }
         EventHandler.activateOverdue();
     };
     //updates all of the task containing side panel categories
@@ -526,7 +530,7 @@ const DOMManip = (()=>{
             _removeAllChildren(e.target.parentElement.parentElement, 1);
         }
         e.target.classList.toggle("closed");
-
+        e.stopPropagation();
     };
 
     //returns the information given by the add task dialog

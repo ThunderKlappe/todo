@@ -364,6 +364,47 @@ const DOMManip = (()=>{
         projectButtonContainer.appendChild(confirmContainer);
     };
 
+    const _fillInDays = (numberOfDays)=>{
+        let overallIndexCount = 0;
+        for(let i = 1; i <= numberOfDays; i++){
+            let displayedTask = false;
+            let taskCount = 0;
+            _getTasks(i).forEach(task=>{
+                _fillInTask(task, task.getNumber(), overallIndexCount++);
+                displayedTask = true;
+                taskCount++;
+            });
+            if(displayedTask){
+                _insertAfter(_makeNewElement("div", `day-${i}-away-label`, "day-away-label", format(add(toDate(new Date()),{days:i}),"MM/dd/yyyy")), 
+                    getElement(".tasks-container").childNodes[getElement(".tasks-container").childNodes.length-taskCount - 1]);
+                overallIndexCount++;
+            }
+            
+        }
+    };
+    const _checkDays = (e, numChanged)=>{
+        const errorMessages = [];
+        if(numChanged > 14){
+            errorMessages.push("Please enter less than 14 days");
+        }else if(numChanged < 1){
+            errorMessages.push("Please enter 1 day or more");
+        }
+        if(errorMessages.length > 0){
+            _displayErrors(e, errorMessages);
+            return false;
+        }else{
+            return true;
+        }
+    };
+    const changeDays = (e)=>{
+
+        const numChanged = getElement(".days-selector").value;
+        if(_checkDays(e, numChanged)){
+            _removeAllChildren(getElement(".tasks-container"), 1);
+            _fillInDays(numChanged);
+        }
+    };
+
     //displays a new project that can be selected to the side panel
     const setupNewProject = ()=>{
         _toggleActive("#add-project-button");
@@ -552,7 +593,9 @@ const DOMManip = (()=>{
         if(getElement("#todays-todo-side").classList.contains("selected")){
             showToday();
         }else if(getElement("#overdue-todo-side").classList.contains("selected")){
-            showToday();
+            showOverdue();
+        }else if(getElement("#days-todo-side").classList.contains("selected")){
+            changeDays();
         }
         if(!getElement("#today-toggle").classList.contains("closed")){
             _displayTodaySide();
@@ -679,37 +722,6 @@ const DOMManip = (()=>{
         _getOverdueTasks().forEach((task, index)=>_fillInTask(task, task.getNumber(), index));
     };
 
-
-    const _fillInDays = (numberOfDays)=>{
-        let overallIndexCount = 1;
-        for(let i = 1; i <= numberOfDays; i++){
-            getElement(".tasks-container").appendChild(_makeNewElement("div", `day-${i}-away-label`, "day-away-label", format(add(toDate(new Date()),{days:i}),"MM/dd/yyyy")));
-            _getTasks(i).forEach(task=>_fillInTask(task, task.getNumber(), overallIndexCount++));
-            overallIndexCount++;
-        }
-    };
-    const _checkDays = (e, numChanged)=>{
-        const errorMessages = [];
-        if(numChanged > 14){
-            errorMessages.push("Please enter less than 14 days");
-        }else if(numChanged < 1){
-            errorMessages.push("Please enter 1 day or more");
-        }
-        if(errorMessages.length > 0){
-            _displayErrors(e, errorMessages);
-            return false;
-        }else{
-            return true;
-        }
-    };
-    const changeDays = (e)=>{
-
-        const numChanged = e.currentTarget.value;
-        if(_checkDays(e, numChanged)){
-            _removeAllChildren(getElement(".tasks-container"), 1);
-            _fillInDays(numChanged);
-        }
-    };
     const showDays = (e)=>{
         _markSelectedProject(e);
         _buildPage("days");

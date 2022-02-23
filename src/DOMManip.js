@@ -397,11 +397,10 @@ const DOMManip = (()=>{
         }
     };
     const changeDays = (e)=>{
-
-        const numChanged = getElement(".days-selector").value;
-        if(_checkDays(e, numChanged)){
+        projectFunctions.setCurrentDays(getElement(".days-selector").value);
+        if(_checkDays(e, projectFunctions.getCurrentDays())){
             _removeAllChildren(getElement(".tasks-container"), 1);
-            _fillInDays(numChanged);
+            _fillInDays(projectFunctions.getCurrentDays());
         }
     };
 
@@ -727,14 +726,15 @@ const DOMManip = (()=>{
         _buildPage("days");
 
         const titleWrapper = getElement(".project-title-wrapper");
-        const daysSelector = _makeNewElement("input", "days-selector", "days-selector", "", {type:"number"}, {max:14}, {min:1}, {value:1});
-        const daysTitle = _makeNewElement("div", "days-title", "project-title", "Days Away");
-        titleWrapper.appendChild(daysSelector);
+        const daysSelector = _makeNewElement("input", "days-selector", "days-selector", "", {type:"number"}, {max:14}, {min:1}, {value:projectFunctions.getCurrentDays()});
+        const daysTitle = _makeNewElement("div", "days-title", "project-title", "Days Away: ");
         titleWrapper.appendChild(daysTitle);
+        titleWrapper.appendChild(daysSelector);
+
 
         EventHandler.activateDaysSelector();
 
-        _fillInDays(1);
+        _fillInDays(projectFunctions.getCurrentDays());
 
         
     };

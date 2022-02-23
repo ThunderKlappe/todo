@@ -11,6 +11,12 @@ export const projectFunctions = (()=>{
 
     let _allProjects = [];
 
+    const _renumberProjects = (projectNumber)=>{
+        for(let i = _allProjects.length-1; i>=projectNumber;i--){
+            _allProjects[i].tasks.forEach(task=>task.reduceProject());
+        }
+    };
+
     //gets the info that was put into the input, checks if it is acceptable, adds it to the 
     //allProjects array if it is, and saves to localstorage
     const addProject = (e)=>{
@@ -70,6 +76,7 @@ export const projectFunctions = (()=>{
 
     const deleteProject = ()=>{
         const projectNumber = DOMManip.getElement(".project-container").dataset.project;
+        _renumberProjects(projectNumber);
         _allProjects.splice(projectNumber, 1);
         if(DOMManip.getElement("#projects-toggle").classList.contains("closed")){
             DOMManip.getElement("#projects-toggle").click();

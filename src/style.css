@@ -243,6 +243,9 @@ select{
     white-space: nowrap;
     overflow-y: auto;
 }
+.task-project-info{
+    font-weight: bold;
+}
 
 .error-message{
     font-size: 18px;

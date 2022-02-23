@@ -22,4 +22,5 @@ export class Task{
     getNumber = ()=>this.number;
 
     toggleComplete = ()=>this.completed = !this.completed;
+    reduceProject = ()=>this.project--;
 }

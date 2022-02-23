@@ -275,6 +275,18 @@ const DOMManip = (()=>{
         EventHandler.clearTextBox();
         EventHandler.activateAddTaskButton();
     };
+    //when a project name is clicked on a task, brings up the selected project
+    const linkProject = (e)=>{
+        const projectToggle = getElement("#projects-toggle");
+        if(projectToggle.classList.contains("closed")){
+            projectToggle.click();
+        }
+        getElements(".project-side-label").forEach(elem =>{
+            if(elem.textContent == e.currentTarget.textContent){
+                elem.click();
+            }
+        });
+    };
 
     //takes a given task and adds a DOM entry in a specific given index of the task list
     const _fillInTask = (task, taskNumber, index)=>{
@@ -286,6 +298,7 @@ const DOMManip = (()=>{
         const newTaskName = _makeNewElement("div", `project-${projectNumber}-task-${taskNumber}-name`, "task-name task-info", task.getName());
         const newTaskDescription = _makeNewElement("div", `project-${projectNumber}-task-${taskNumber}-description`, "task-description task-info", task.getDescription());
         const newTaskDate = _makeNewElement("div", `project-${projectNumber}-task-${taskNumber}-date`, "task-date task-info", task.getDate());
+        const taskProjectLabel = _makeNewElement("div", `project-${projectNumber}-label`, "task-project-info task-info");
         const newTaskEditButton = _makeNewElement("button", `project-${projectNumber}-task-${taskNumber}-edit-button`, "edit-button");
         const newTaskEditIcon = _makeNewElement("i", "", "fa-solid fa-pencil edit-icon");
         const newTaskEditText =_makeNewElement("span", "", "edit-text", "Edit Task");
@@ -294,6 +307,7 @@ const DOMManip = (()=>{
         newTaskContainer.appendChild(newTaskName);
         newTaskContainer.appendChild(newTaskDescription);
         newTaskContainer.appendChild(newTaskDate);
+        newTaskContainer.appendChild(taskProjectLabel);
         newTaskEditButton.appendChild(newTaskEditIcon);
         newTaskEditButton.appendChild(newTaskEditText);
         newTaskContainer.appendChild(newTaskEditButton);
@@ -302,6 +316,16 @@ const DOMManip = (()=>{
         EventHandler.activateCheckbox(index);
         if(task.getComplete()){
             newTaskCheckbox.setAttribute("checked","checked");
+        }
+        let isProjectSelected = false;
+        getElements(".project-side-label").forEach(elem=> {
+            if(elem.classList.contains("selected")){
+                isProjectSelected = true;
+            }
+        });
+        if(!isProjectSelected){
+            taskProjectLabel.textContent = projectFunctions.getAllProjects()[projectNumber].getName();     
+            EventHandler.activateProjectLink(taskProjectLabel);
         }
         
     };
@@ -694,7 +718,7 @@ const DOMManip = (()=>{
 
     return {getElement, getElements,removeText, checkNewProject, setupNewProject, cancelNewProject,
             refreshTaskSides, getNewProjInfo, updateProjectList, expandToggle, showProject, displayDeleteProject,
-            getTaskInfo, getTaskIndex, checkNewTask, displayEditProject, displayEditTask, 
+            getTaskInfo, getTaskIndex, checkNewTask, displayEditProject, displayEditTask, linkProject,
             updateTaskList, cancelEdit, cancelProjectEdit, showToday,showOverdue, startPage};
 })();
 

@@ -82,6 +82,10 @@ const EventHandler = (()=>{
     const activateCheckbox = index=>{
         DOMManip.getElements(".task-checkbox")[index].addEventListener("click", projectFunctions.toggleTaskComplete);
     };
+    //If a project title is shown on a task, clicking it goes to the associated project
+    const activateProjectLink=(button)=>{
+        button.addEventListener("click", DOMManip.linkProject);
+    };
     //changes the button to edit a task into a confirmation button and activates the cancel button
     const activateConfirmTaskEdit = button=>{
         button.removeEventListener("click", DOMManip.displayEditTask);
@@ -90,9 +94,10 @@ const EventHandler = (()=>{
 
     };
 
-    return{ activateAddButton, initStartingListeners, addProjectSubmission,activateToday, activateProjects, activateOverdue,
-            activateSides, clearTextBox, activateProjectButtons, activateAddTaskButton, activateCheckbox,
-            activateEditButton, activateConfirmProjectEdit, activateConfirmTaskEdit, activateCancelButton, activateDeleteProject};
+    return{ activateAddButton, initStartingListeners, addProjectSubmission,activateToday, activateProjects, 
+            activateOverdue, activateSides, clearTextBox, activateProjectButtons, activateAddTaskButton, 
+            activateCheckbox, activateProjectLink, activateEditButton, activateConfirmProjectEdit, 
+            activateConfirmTaskEdit, activateCancelButton, activateDeleteProject};
 })();
 
 

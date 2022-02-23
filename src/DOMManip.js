@@ -33,7 +33,7 @@ const DOMManip = (()=>{
     };
 
     //clears out all child nodes of an element, skips as many elements as requested
-    const _removeAllChildren = (element, skip)=>{
+    const _removeAllChildren = (element, skip = 0)=>{
         for(let i = element.childNodes.length; i > skip; i--){
             element.childNodes[i-1].remove();
         }
@@ -208,7 +208,7 @@ const DOMManip = (()=>{
         titleButtonContainer.appendChild(deleteProjectButton);
 
         if(titleWrapper.childNodes.length >0){
-            _removeAllChildren(titleWrapper, 0);
+            _removeAllChildren(titleWrapper);
         }
         titleWrapper.appendChild(projectTitle);
         titleWrapper.appendChild(titleButtonContainer);
@@ -436,7 +436,7 @@ const DOMManip = (()=>{
         titleWrapper.firstElementChild.remove();
 
         const projectButtonContainer = getElement(".button-container");
-        _removeAllChildren(projectButtonContainer, 0);
+        _removeAllChildren(projectButtonContainer);
 
         _displayConfirmCancel();
 
@@ -447,7 +447,7 @@ const DOMManip = (()=>{
     //displays the confirmation of deleting a project
     const displayDeleteProject= ()=>{
         const projectButtonContainer = getElement(".button-container");
-        _removeAllChildren(projectButtonContainer, 0);
+        _removeAllChildren(projectButtonContainer);
 
         _displayConfirmCancel();
 
@@ -679,22 +679,52 @@ const DOMManip = (()=>{
         _getOverdueTasks().forEach((task, index)=>_fillInTask(task, task.getNumber(), index));
     };
 
-    const showDays = (e, numberOfDays = 2)=>{
-        _markSelectedProject(e);
-        _buildPage("days");
 
-        const titleWrapper = getElement(".project-title-wrapper");
-        const daysSelector = _makeNewElement("input", "days-selector", "days-selector", "", {value:1});
-        const daysTitle = _makeNewElement("div", "days-title", "project-title", "Days Away");
-        titleWrapper.appendChild(daysSelector);
-        titleWrapper.appendChild(daysTitle);
-
+    const _fillInDays = (numberOfDays)=>{
         let overallIndexCount = 1;
         for(let i = 1; i <= numberOfDays; i++){
             getElement(".tasks-container").appendChild(_makeNewElement("div", `day-${i}-away-label`, "day-away-label", format(add(toDate(new Date()),{days:i}),"MM/dd/yyyy")));
             _getTasks(i).forEach(task=>_fillInTask(task, task.getNumber(), overallIndexCount++));
             overallIndexCount++;
         }
+    };
+    const _checkDays = (e, numChanged)=>{
+        const errorMessages = [];
+        if(numChanged > 14){
+            errorMessages.push("Please enter less than 14 days");
+        }else if(numChanged < 1){
+            errorMessages.push("Please enter 1 day or more");
+        }
+        if(errorMessages.length > 0){
+            _displayErrors(e, errorMessages);
+            return false;
+        }else{
+            return true;
+        }
+    };
+    const changeDays = (e)=>{
+
+        const numChanged = e.currentTarget.value;
+        if(_checkDays(e, numChanged)){
+            _removeAllChildren(getElement(".tasks-container"), 1);
+            _fillInDays(numChanged);
+        }
+    };
+    const showDays = (e)=>{
+        _markSelectedProject(e);
+        _buildPage("days");
+
+        const titleWrapper = getElement(".project-title-wrapper");
+        const daysSelector = _makeNewElement("input", "days-selector", "days-selector", "", {type:"number"}, {max:14}, {min:1}, {value:1});
+        const daysTitle = _makeNewElement("div", "days-title", "project-title", "Days Away");
+        titleWrapper.appendChild(daysSelector);
+        titleWrapper.appendChild(daysTitle);
+
+        EventHandler.activateDaysSelector();
+
+        _fillInDays(1);
+
+        
     };
 
     //initalizes the webpage and starts the basic listeners
@@ -712,7 +742,8 @@ const DOMManip = (()=>{
     return {getElement, getElements,removeText, checkNewProject, setupNewProject, cancelNewProject,
             refreshTaskSides, getNewProjInfo, updateProjectList, expandToggle, showProject, displayDeleteProject,
             getTaskInfo, getTaskIndex, checkNewTask, displayEditProject, displayEditTask, linkProject,
-            updateTaskList, cancelEdit, cancelProjectEdit, showToday,showOverdue, showDays, startPage};
+            updateTaskList, cancelEdit, cancelProjectEdit, showToday,showOverdue, showDays, startPage,
+            changeDays};
 })();
 
 export default DOMManip;

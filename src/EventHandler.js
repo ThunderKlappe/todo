@@ -100,11 +100,14 @@ const EventHandler = (()=>{
         button.parentElement.lastElementChild.addEventListener("click", DOMManip.cancelEdit);
 
     };
+    const activateDaysSelector = ()=>{
+        DOMManip.getElement(".days-selector").addEventListener("change", DOMManip.changeDays);
+    };
 
     return{ activateAddButton, initStartingListeners, addProjectSubmission,activateToday, activateProjects, 
             activateOverdue, activateSides, clearTextBox, activateProjectButtons, activateAddTaskButton, 
             activateCheckbox, activateProjectLink, activateEditButton, activateConfirmProjectEdit, 
-            activateConfirmTaskEdit, activateCancelButton, activateDeleteProject};
+            activateConfirmTaskEdit, activateCancelButton, activateDeleteProject, activateDaysSelector};
 })();
 
 

@@ -155,7 +155,7 @@ const DOMManip = (()=>{
     };
     const _displayOverdueSide = ()=>{
         _revealArray(getElement("#overdue-todo-side").parentElement, _getOverdueTasks(), "task", "overdue");
-        EventHandler.activateToday();
+        EventHandler.activateOverdue();
     };
 
     const refreshTaskSides = ()=>{

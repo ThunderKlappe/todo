@@ -87,7 +87,7 @@ const EventHandler = (()=>{
     };
     //makes the task's check box clickable to mark tasks as complete
     const activateCheckbox = index=>{
-        DOMManip.getElements(".task-checkbox")[index].addEventListener("click", projectFunctions.toggleTaskComplete);
+        DOMManip.getElement(".tasks-container").childNodes[index].firstElementChild.addEventListener("click", projectFunctions.toggleTaskComplete);
     };
     //If a project title is shown on a task, clicking it goes to the associated project
     const activateProjectLink=(button)=>{

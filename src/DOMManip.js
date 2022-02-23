@@ -323,7 +323,7 @@ const DOMManip = (()=>{
         newTaskContainer.appendChild(newTaskEditButton);
         _insertAfter(newTaskContainer,tasksContainer.childNodes[index]);
         EventHandler.activateEditButton(newTaskEditButton);
-        EventHandler.activateCheckbox(index);
+        EventHandler.activateCheckbox(index+1);
         if(task.getComplete()){
             newTaskCheckbox.setAttribute("checked","checked");
         }
@@ -679,7 +679,7 @@ const DOMManip = (()=>{
         _getOverdueTasks().forEach((task, index)=>_fillInTask(task, task.getNumber(), index));
     };
 
-    const showDays = (e)=>{
+    const showDays = (e, numberOfDays = 2)=>{
         _markSelectedProject(e);
         _buildPage("days");
 
@@ -689,8 +689,12 @@ const DOMManip = (()=>{
         titleWrapper.appendChild(daysSelector);
         titleWrapper.appendChild(daysTitle);
 
-        _getTasks(1).forEach((task, index)=>_fillInTask(task, task.getNumber(), index));
-    
+        let overallIndexCount = 1;
+        for(let i = 1; i <= numberOfDays; i++){
+            getElement(".tasks-container").appendChild(_makeNewElement("div", `day-${i}-away-label`, "day-away-label", format(add(toDate(new Date()),{days:i}),"MM/dd/yyyy")));
+            _getTasks(i).forEach(task=>_fillInTask(task, task.getNumber(), overallIndexCount++));
+            overallIndexCount++;
+        }
     };
 
     //initalizes the webpage and starts the basic listeners

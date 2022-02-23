@@ -327,6 +327,23 @@ input[type="checkbox" i] {
     background-color: #A1A1A1;
 }
 
+#days-selector{
+    background-color: inherit;
+    border-bottom: none;
+    font-size: 36px;
+    width: 50px;
+    margin-top: 10px;
+    filter: brightness(80%);
+    border-radius: 30px;
+    text-align: center;
+    padding: 10px;
+}
+
+.day-away-label{
+    font-size: 20px;
+    font-weight: bold;
+    padding: 10px 0px 10px 100px
+}
 /* Scroll Bar */
 ::-webkit-scrollbar {
     width: 20px;

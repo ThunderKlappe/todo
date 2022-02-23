@@ -39,6 +39,11 @@ const EventHandler = (()=>{
         DOMManip.getElement("#overdue-todo-side").addEventListener("click", DOMManip.showOverdue);
         DOMManip.getElements(".task-side-label.overdue").forEach(ele => ele.addEventListener("click", DOMManip.showOverdue));
     };
+    //clicking the Overdue header or any of the task that are Overdue brings up the Overdue page
+    const activateDays = ()=>{
+        DOMManip.getElement("#days-todo-side").addEventListener("click", DOMManip.showDays);
+    };
+
     //makes the projects clickable, maintains only one action listener on each project
     const activateProjects = ()=>{
         DOMManip.getElements(".project-side-label").forEach(ele=>ele.removeEventListener("click", DOMManip.showProject));
@@ -48,6 +53,7 @@ const EventHandler = (()=>{
     const activateSides = ()=>{
         activateToday();
         activateOverdue();
+        activateDays();
         activateProjects();
     };
     //activates the edit project buttons

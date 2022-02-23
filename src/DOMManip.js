@@ -1,6 +1,6 @@
 import { projectFunctions } from ".";
 import EventHandler from "./EventHandler";
-import { toDate, format, add, parseISO, subDays, parse, isBefore, startOfDay } from "date-fns";
+import { toDate, format, add, parseISO, parse, isBefore, startOfDay } from "date-fns";
 
 const DOMManip = (()=>{
     //shorthand to get elements easier
@@ -70,8 +70,6 @@ const DOMManip = (()=>{
 
         const daysSideHeaderContainer = _makeNewElement("div", "", "side-header-container");
         const daysTodoSide = _makeNewElement("div", "days-todo-side", "side-header days", "Days Away");
-        const daysSideDropdown = _makeNewElement("div", "days-toggle", "dropdown-toggle fix-anim closed fa-solid fa-caret-down");
-        daysTodoSide.appendChild(daysSideDropdown);
         daysSideHeaderContainer.appendChild(daysTodoSide);
 
         const projectSideHeaderContainer = _makeNewElement("div", "", "side-header-container");
@@ -150,7 +148,7 @@ const DOMManip = (()=>{
     };
 
     //puts an array of elements underneath a parent element
-    const _revealArray = (parent, array, type, due)=>{
+    const _revealArray = (parent, array, type, due = "")=>{
         _removeAllChildren(parent, 1);
         array.forEach((elem, index)=> parent.appendChild(
             _makeNewElement("div", `${type}-${index}`, `${type}-side-label ${due} ${(type=="project" && elem.isSelected())?"selected" : ""}`, elem.getName(), {"data-index": `${index}`}, )));
@@ -216,37 +214,39 @@ const DOMManip = (()=>{
         titleWrapper.appendChild(titleButtonContainer);
     };
 
+    //clears the selection on the side panel
+    const _clearSideSelection = ()=>{
+        getElements(".project-side-label").forEach(ele=>ele.classList.remove("selected"));
+        getElement("#todays-todo-side").classList.remove("selected");
+        getElement("#overdue-todo-side").classList.remove("selected");
+        getElement("#days-todo-side").classList.remove("selected");
+        projectFunctions.getAllProjects().forEach(proj => proj.markSelected(false));
+    };
+
+    //clears and marks the selection for a given task category
+    const _setTaskSelection = type =>{
+        _clearSideSelection();
+        getElement(`#${type}-todo-side`).classList.add("selected");
+    };
+
     //highlights what project (or todays tasks) is selected. Defaults to the first project
     const _markSelectedProject = (e)=>{
         if(e){
             if(e.currentTarget.classList.contains("project-side-label")){
-                getElements(".project-side-label").forEach(ele=>ele.classList.remove("selected"));
-                getElement("#todays-todo-side").classList.remove("selected");
-                getElement("#overdue-todo-side").classList.remove("selected");
-                projectFunctions.getAllProjects().forEach(proj => proj.markSelected(false));
+                _clearSideSelection();
                 projectFunctions.getAllProjects()[e.target.dataset.index].markSelected(true);
                 e.target.classList.add("selected");
             }
             else if(e.currentTarget.classList.contains("today")){
-                getElements(".project-side-label").forEach(ele=>ele.classList.remove("selected"));
-                getElement("#todays-todo-side").classList.remove("selected");
-                getElement("#overdue-todo-side").classList.remove("selected");
-                projectFunctions.getAllProjects().forEach(proj => proj.markSelected(false));
-                getElement("#todays-todo-side").classList.add("selected");
+                _setTaskSelection("todays");
             }else if(e.currentTarget.classList.contains("overdue")){
-                getElements(".project-side-label").forEach(ele=>ele.classList.remove("selected"));
-                getElement("#todays-todo-side").classList.remove("selected");
-                getElement("#overdue-todo-side").classList.remove("selected");
-                projectFunctions.getAllProjects().forEach(proj => proj.markSelected(false));
-                getElement("#overdue-todo-side").classList.add("selected");
+                _setTaskSelection("overdue");
+            }else if(e.currentTarget.classList.contains("days")){
+                _setTaskSelection("days");
             }
         }
         else{
-            getElements(".project-side-label").forEach(ele=>ele.classList.remove("selected"));
-            getElement("#todays-todo-side").classList.remove("selected");
-            getElement("#overdue-todo-side").classList.remove("selected");
-            projectFunctions.getAllProjects().forEach(proj => proj.markSelected(false));
-            getElement("#todays-todo-side").classList.add("selected");
+            _setTaskSelection("todays");
         }
     };
 
@@ -261,7 +261,7 @@ const DOMManip = (()=>{
         const addTaskContainer = _makeNewElement("div", "add-task-container", "input-container");
         const addTaskName = _makeNewElement("input", "add-task-name-input", "add-task-info","",{type:"text"}, {value:"Task Name"});
         const addTaskDescription = _makeNewElement("input", "add-task-description-input", "add-task-info","",{type:"text"}, {value:"Task Description"});
-        const addTaskDate = _makeNewElement("input", "add-task-date-input", "add-task-info","Due Date",{type:"date"},{min:subDays(new Date(), 1).toISOString().split("T")[0]});
+        const addTaskDate = _makeNewElement("input", "add-task-date-input", "add-task-info","Due Date",{type:"date"},{min:(startOfDay(new Date())).toISOString().split("T")[0]});
         const addTaskPriority = _makeNewElement("select", "add-task-priority-input", "add-task-info","");
         const addTaskPriorityDefault = _makeNewElement("option","","","Priority", {value:0} );
         const addTaskPriorityLow = _makeNewElement("option","","","Low", {value:"Low"},{style:"background-color:#E1ADAD"});
@@ -573,7 +573,7 @@ const DOMManip = (()=>{
 
         const editTaskName = _makeNewElement("input", "edit-task-name-input", "edit-task-info","",{type:"text"}, {value:editTask.getName()});
         const editTaskDescription = _makeNewElement("input", "edit-task-description-input", "edit-task-info","",{type:"text"}, {value:editTask.getDescription()});
-        const editTaskDate = _makeNewElement("input", "edit-task-date-input", "edit-task-info","Due Date",{type:"date"}, {value:new Date(editTask.getDate()).toISOString().split("T")[0]}, {min:subDays(new Date(), 1).toISOString().split("T")[0]});
+        const editTaskDate = _makeNewElement("input", "edit-task-date-input", "edit-task-info","Due Date",{type:"date"}, {value:new Date(editTask.getDate()).toISOString().split("T")[0]}, {min:(startOfDay(new Date())).toISOString().split("T")[0]});
         const editTaskPriority = _makeNewElement("select", "edit-task-priority-input", "edit-task-info","");
         const editTaskPriorityLow = _makeNewElement("option","","","Low", {value:"Low"},{style:"background-color:#E1ADAD"});
         const editTaskPriorityMedium = _makeNewElement("option","","","Medium", {value:"Medium"}, {style:"background-color:#EFEF38"});
@@ -623,61 +623,47 @@ const DOMManip = (()=>{
         updateTaskList(task, project, index);
     };
 
+    //builds the basic outline of any page
+    const _buildPage = (type)=>{
+        const mainDisplay = getElement("#main-display");
+        if(mainDisplay.childNodes.length >0){
+            mainDisplay.firstChild.remove();
+        }
+        const pageContainer = _makeNewElement("div", `${type}-containe}`, "project-container");
+        const titleWrapper = _makeNewElement("div" , `${type}-title-wrapper`, "project-title-wrapper");
+        const tasksContainer = _makeNewElement("div", `${type}-tasks-container`, "tasks-container");
+        const tasksWrapper = _makeNewElement("div", `${type}-tasks-wrapper`, "tasks-wrapper");
+        const spacer = _makeNewElement("div");
+        pageContainer.appendChild(titleWrapper);
+        tasksContainer.appendChild(spacer);
+        tasksWrapper.appendChild(tasksContainer);
+        pageContainer.appendChild(tasksWrapper);
+        mainDisplay.appendChild(pageContainer);
+    };
+
     //displays a project page based on what project was selected
     const showProject = (e)=>{
         _markSelectedProject(e);
-        const mainDisplay = getElement("#main-display");
-        mainDisplay.firstChild.remove();
-
         const projectNumber = _getProjectNumber();
-        const currentProject = projectFunctions.getAllProjects()[projectNumber];
+        _buildPage(e, `project-${projectNumber}`);
 
-        const projectContainer = _makeNewElement("div", `project-${projectNumber}-container`, "project-container", "", {"data-project":projectNumber});
-        const projectTitleWrapper = _makeNewElement("div" , `project-${projectNumber}-title-wrapper`, "project-title-wrapper");
-        const tasksContainer = _makeNewElement("div", `project-${projectNumber}-tasks-container`, "tasks-container");
-        const tasksWrapper = _makeNewElement("div", `project-${projectNumber}-tasks-wrapper`, "tasks-wrapper");
-        const spacer = _makeNewElement("div");
-        projectContainer.appendChild(projectTitleWrapper);
-        tasksContainer.appendChild(spacer);
-        tasksWrapper.appendChild(tasksContainer);
-        projectContainer.appendChild(tasksWrapper);
-        mainDisplay.appendChild(projectContainer);
+        getElement(".project-container").setAttribute("data-project",projectNumber);
         _displayTitle();
         EventHandler.activateProjectButtons();
-        currentProject.tasks.forEach((task, index) => _fillInTask(task, index, index));
+        projectFunctions.getAllProjects()[projectNumber].tasks.forEach((task, index) => _fillInTask(task, index, index));
         _displayTaskInput();
     };
 
     //shows the Today's Tasks page
     const showToday = (e)=>{
         _markSelectedProject(e);
-
-        const todaysTasks = _getTasks(0);
-        const today = format(toDate(new Date()),"MM/dd/yyyy");
-        const mainDisplay = getElement("#main-display");
-
-        if(mainDisplay.childNodes.length >0){
-            mainDisplay.firstChild.remove();
-        }
-
-        const todayContainer = _makeNewElement("div", "today-container", "project-container");
-        const todayTitleWrapper = _makeNewElement("div" , "today-title-wrapper", "project-title-wrapper");
-        const todayTitle = _makeNewElement("div", "today-title", "project-title", `Today: ${today}`);
+        _buildPage("today");
         
-        const tasksContainer = _makeNewElement("div", "todays-tasks-container", "tasks-container");
-        const tasksWrapper = _makeNewElement("div", "todays-tasks-wrapper", "tasks-wrapper");
-        const spacer = _makeNewElement("div");
-        todayTitleWrapper.appendChild(todayTitle);
-        todayContainer.appendChild(todayTitleWrapper);
-        tasksContainer.appendChild(spacer);
-        tasksWrapper.appendChild(tasksContainer);
-        todayContainer.appendChild(tasksWrapper);
-        mainDisplay.appendChild(todayContainer);
-    
+        const today = format(toDate(new Date()),"MM/dd/yyyy");
+        const todayTitle = _makeNewElement("div", "today-title", "project-title", `Today: ${today}`);
+        getElement(".project-title-wrapper").appendChild(todayTitle);
 
-        todaysTasks.forEach((task, index)=>{
-           _fillInTask(task, task.getNumber(), index);
-        });
+        _getTasks(0).forEach((task, index)=>_fillInTask(task, task.getNumber(), index));
         
         
     };
@@ -685,34 +671,26 @@ const DOMManip = (()=>{
     //brings up the page that shows all of the overdue tasks
     const showOverdue = (e)=>{
         _markSelectedProject(e);
+        _buildPage("overdue");
 
-        const overdueTasks = _getOverdueTasks();
-        const mainDisplay = getElement("#main-display");
+        const overdueTitle = _makeNewElement("div", "overdue-title", "project-title", "Overdue");
+        getElement(".project-title-wrapper").appendChild(overdueTitle);
 
-        if(mainDisplay.childNodes.length >0){
-            mainDisplay.firstChild.remove();
-        }
+        _getOverdueTasks().forEach((task, index)=>_fillInTask(task, task.getNumber(), index));
+    };
 
-        const overdueContainer = _makeNewElement("div", "today-container", "project-container");
-        const overdueTitleWrapper = _makeNewElement("div" , "today-title-wrapper", "project-title-wrapper");
-        const overdueTitle = _makeNewElement("div", "today-title", "project-title", "Overdue");
-        
-        const tasksContainer = _makeNewElement("div", "todays-tasks-container", "tasks-container");
-        const tasksWrapper = _makeNewElement("div", "todays-tasks-wrapper", "tasks-wrapper");
-        const spacer = _makeNewElement("div");
-        overdueTitleWrapper.appendChild(overdueTitle);
-        overdueContainer.appendChild(overdueTitleWrapper);
-        tasksContainer.appendChild(spacer);
-        tasksWrapper.appendChild(tasksContainer);
-        overdueContainer.appendChild(tasksWrapper);
-        mainDisplay.appendChild(overdueContainer);
+    const showDays = (e)=>{
+        _markSelectedProject(e);
+        _buildPage("days");
+
+        const titleWrapper = getElement(".project-title-wrapper");
+        const daysSelector = _makeNewElement("input", "days-selector", "days-selector", "", {value:1});
+        const daysTitle = _makeNewElement("div", "days-title", "project-title", "Days Away");
+        titleWrapper.appendChild(daysSelector);
+        titleWrapper.appendChild(daysTitle);
+
+        _getTasks(1).forEach((task, index)=>_fillInTask(task, task.getNumber(), index));
     
-
-        overdueTasks.forEach((task, index)=>{
-           _fillInTask(task, task.getNumber(), index);
-        });
-        
-        
     };
 
     //initalizes the webpage and starts the basic listeners
@@ -730,7 +708,7 @@ const DOMManip = (()=>{
     return {getElement, getElements,removeText, checkNewProject, setupNewProject, cancelNewProject,
             refreshTaskSides, getNewProjInfo, updateProjectList, expandToggle, showProject, displayDeleteProject,
             getTaskInfo, getTaskIndex, checkNewTask, displayEditProject, displayEditTask, linkProject,
-            updateTaskList, cancelEdit, cancelProjectEdit, showToday,showOverdue, startPage};
+            updateTaskList, cancelEdit, cancelProjectEdit, showToday,showOverdue, showDays, startPage};
 })();
 
 export default DOMManip;

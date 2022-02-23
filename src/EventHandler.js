@@ -19,7 +19,7 @@ const EventHandler = (()=>{
     //activates the listeners for all of clickable buttons at the start of the page load
     const initStartingListeners = ()=>{
         activateAddButton();
-        DOMManip.getElements(".dropdown-toggle").forEach(ele =>ele.addEventListener("click", DOMManip.expandToggle));
+        DOMManip.getElements(".dropdown-toggle").forEach(ele =>ele.addEventListener("click", DOMManip.expandToggle,  {capture:true}));
     };
 
     //changes the add project button to cancel adding project and activates the submit button
@@ -39,6 +39,11 @@ const EventHandler = (()=>{
         DOMManip.getElement("#overdue-todo-side").addEventListener("click", DOMManip.showOverdue);
         DOMManip.getElements(".task-side-label.overdue").forEach(ele => ele.addEventListener("click", DOMManip.showOverdue));
     };
+    //clicking the Overdue header or any of the task that are Overdue brings up the Overdue page
+    const activateDays = ()=>{
+        DOMManip.getElement("#days-todo-side").addEventListener("click", DOMManip.showDays);
+    };
+
     //makes the projects clickable, maintains only one action listener on each project
     const activateProjects = ()=>{
         DOMManip.getElements(".project-side-label").forEach(ele=>ele.removeEventListener("click", DOMManip.showProject));
@@ -48,6 +53,7 @@ const EventHandler = (()=>{
     const activateSides = ()=>{
         activateToday();
         activateOverdue();
+        activateDays();
         activateProjects();
     };
     //activates the edit project buttons
@@ -81,7 +87,7 @@ const EventHandler = (()=>{
     };
     //makes the task's check box clickable to mark tasks as complete
     const activateCheckbox = index=>{
-        DOMManip.getElements(".task-checkbox")[index].addEventListener("click", projectFunctions.toggleTaskComplete);
+        DOMManip.getElement(".tasks-container").childNodes[index].firstElementChild.addEventListener("click", projectFunctions.toggleTaskComplete);
     };
     //If a project title is shown on a task, clicking it goes to the associated project
     const activateProjectLink=(button)=>{
@@ -94,11 +100,14 @@ const EventHandler = (()=>{
         button.parentElement.lastElementChild.addEventListener("click", DOMManip.cancelEdit);
 
     };
+    const activateDaysSelector = ()=>{
+        DOMManip.getElement(".days-selector").addEventListener("change", DOMManip.changeDays);
+    };
 
     return{ activateAddButton, initStartingListeners, addProjectSubmission,activateToday, activateProjects, 
             activateOverdue, activateSides, clearTextBox, activateProjectButtons, activateAddTaskButton, 
             activateCheckbox, activateProjectLink, activateEditButton, activateConfirmProjectEdit, 
-            activateConfirmTaskEdit, activateCancelButton, activateDeleteProject};
+            activateConfirmTaskEdit, activateCancelButton, activateDeleteProject, activateDaysSelector};
 })();
 
 

@@ -11,6 +11,8 @@ export const projectFunctions = (()=>{
 
     let _allProjects = [];
 
+    let _currentDaysRequested = 1; 
+
     //used when a project is deleted, makes all of the tasks under each project go to their current
     //project's index in the allProjects array
     const _renumberProjects = (projectNumber)=>{
@@ -100,6 +102,8 @@ export const projectFunctions = (()=>{
             DOMManip.showToday(e);
         }else if(DOMManip.getElement(".selected").id == "overdue-todo-side"){
             DOMManip.showOverdue(e);
+        }else if(DOMManip.getElement(".selected").id == "days-todo-side"){
+            DOMManip.changeDays();
         }else{
             DOMManip.showProject(e);
         }
@@ -111,6 +115,8 @@ export const projectFunctions = (()=>{
     const getAllProjects = ()=>{
         return _allProjects.map(ele=>ele);
     };
+    const getCurrentDays = ()=> _currentDaysRequested;
+    const setCurrentDays = (newValue) => _currentDaysRequested = newValue;
     //saves the loaded projects from localstorage into the allprojects array
     const loadProjects = ()=>{
         _allProjects = dataStorage.loadData();
@@ -118,7 +124,7 @@ export const projectFunctions = (()=>{
     };
 
     return {addProject, addTask, confirmProjectEdit, confirmTaskEdit, deleteProject, toggleTaskComplete,
-            getAllProjects, loadProjects};
+            getAllProjects, loadProjects, getCurrentDays, setCurrentDays};
 
 })();
 

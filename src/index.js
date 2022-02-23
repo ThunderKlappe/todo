@@ -11,6 +11,8 @@ export const projectFunctions = (()=>{
 
     let _allProjects = [];
 
+    //used when a project is deleted, makes all of the tasks under each project go to their current
+    //project's index in the allProjects array
     const _renumberProjects = (projectNumber)=>{
         for(let i = _allProjects.length-1; i>=projectNumber;i--){
             _allProjects[i].tasks.forEach(task=>task.reduceProject());

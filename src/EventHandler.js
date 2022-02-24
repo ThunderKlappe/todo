@@ -81,9 +81,17 @@ const EventHandler = (()=>{
         DOMManip.getElement("#add-task-button").addEventListener("click", projectFunctions.addTask);
     };
     //activates the edit task button for that specific task
-    const activateEditButton = button=>{
+    const _activateEditTaskButton = button=>{
         button.removeEventListener("click", projectFunctions.confirmTaskEdit);
         button.addEventListener("click", DOMManip.displayEditTask);
+    };
+    const _activateDeleteTaskButton = button=>{
+        button.removeEventListener("click", projectFunctions.confirmTaskDelete);
+        button.addEventListener("click", DOMManip.displayDeleteTask);
+    };
+    const activateTaskButtons = (edit, del)=>{
+        _activateEditTaskButton(edit);
+        _activateDeleteTaskButton(del);
     };
     //makes the task's check box clickable to mark tasks as complete
     const activateCheckbox = index=>{
@@ -97,7 +105,15 @@ const EventHandler = (()=>{
     const activateConfirmTaskEdit = button=>{
         button.removeEventListener("click", DOMManip.displayEditTask);
         button.addEventListener("click", projectFunctions.confirmTaskEdit);
-        button.parentElement.lastElementChild.addEventListener("click", DOMManip.cancelEdit);
+        button.nextSibling.removeEventListener("click", DOMManip.displayDeleteTask);
+        button.nextSibling.addEventListener("click", DOMManip.cancelEdit);
+
+    };
+    const activateConfirmTaskDelete = button=>{
+        button.previousSibling.removeEventListener("click", DOMManip.displayEditTask);
+        button.previousSibling.addEventListener("click", projectFunctions.confirmTaskDelete);
+        button.removeEventListener("click", DOMManip.displayDeleteTask);
+        button.addEventListener("click", DOMManip.cancelEdit);
 
     };
     const activateDaysSelector = ()=>{
@@ -106,8 +122,9 @@ const EventHandler = (()=>{
 
     return{ activateAddButton, initStartingListeners, addProjectSubmission,activateToday, activateProjects, 
             activateOverdue, activateSides, clearTextBox, activateProjectButtons, activateAddTaskButton, 
-            activateCheckbox, activateProjectLink, activateEditButton, activateConfirmProjectEdit, 
-            activateConfirmTaskEdit, activateCancelButton, activateDeleteProject, activateDaysSelector};
+            activateCheckbox, activateProjectLink, activateTaskButtons, activateConfirmProjectEdit, 
+            activateConfirmTaskEdit,activateConfirmTaskDelete, activateCancelButton, activateDeleteProject, 
+            activateDaysSelector};
 })();
 
 

@@ -23,4 +23,5 @@ export class Task{
 
     toggleComplete = ()=>this.completed = !this.completed;
     reduceProject = ()=>this.project--;
+    reduceTask = ()=>this.task--;
 }

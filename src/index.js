@@ -20,6 +20,12 @@ export const projectFunctions = (()=>{
             _allProjects[i].tasks.forEach(task=>task.reduceProject());
         }
     };
+    const _renumberTasks = (projectNumber, taskNumber)=>{
+        for(let i = _allProjects[projectNumber].tasks.length-1; i>=taskNumber;i--){
+            _allProjects[projectNumber].tasks[i].reduceTask();
+        }
+
+    };
     const _sortTasks = projectNumber=>{
         const sortedTasks = DOMManip.sortArray(_allProjects[projectNumber].getTasks());
         _allProjects[projectNumber].tasks = sortedTasks.map(ele=>ele);
@@ -84,6 +90,16 @@ export const projectFunctions = (()=>{
             dataStorage.saveData();
         }
     };
+    const confirmTaskDelete = (e) =>{
+        const projectNumber = e.currentTarget.parentElement.dataset.project;
+        const taskNumber = e.currentTarget.parentElement.dataset.task;
+        _renumberTasks(projectNumber, taskNumber);
+        _allProjects[projectNumber].tasks.splice(taskNumber,1);
+ 
+        DOMManip.refreshTaskSides();
+        DOMManip.getElement(`#project-${projectNumber}`).click();
+        dataStorage.saveData();
+    };
 
     //removes a project from the allProjects array and saves to localstorage
 
@@ -132,7 +148,7 @@ export const projectFunctions = (()=>{
 
     };
 
-    return {addProject, addTask, confirmProjectEdit, confirmTaskEdit, deleteProject, toggleTaskComplete,
+    return {addProject, addTask, confirmProjectEdit, confirmTaskEdit, confirmTaskDelete, deleteProject, toggleTaskComplete,
             getAllProjects, loadProjects, getCurrentDays, setCurrentDays};
 
 })();

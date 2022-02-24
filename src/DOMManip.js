@@ -334,6 +334,9 @@ const DOMManip = (()=>{
         const newTaskEditButton = _makeNewElement("button", `project-${projectNumber}-task-${taskNumber}-edit-button`, "edit-button");
         const newTaskEditIcon = _makeNewElement("i", "", "fa-solid fa-pencil edit-icon");
         const newTaskEditText =_makeNewElement("span", "", "edit-text", "Edit Task");
+        const newTaskDeleteButton = _makeNewElement("button", `project-${projectNumber}-task-${taskNumber}-delete-button`, "edit-button delete");
+        const newTaskDeleteIcon = _makeNewElement("i", "", "fa-solid fa-trash edit-icon");
+        const newTaskDeleteText =_makeNewElement("span", "", "delete-text", "Delete Task");
 
         newTaskContainer.appendChild(newTaskCheckbox);
         newTaskContainer.appendChild(newTaskName);
@@ -343,8 +346,12 @@ const DOMManip = (()=>{
         newTaskEditButton.appendChild(newTaskEditIcon);
         newTaskEditButton.appendChild(newTaskEditText);
         newTaskContainer.appendChild(newTaskEditButton);
+        newTaskDeleteButton.appendChild(newTaskDeleteIcon);
+        newTaskDeleteButton.appendChild(newTaskDeleteText);
+        newTaskContainer.appendChild(newTaskDeleteButton);
+
         _insertAfter(newTaskContainer,tasksContainer.childNodes[index]);
-        EventHandler.activateEditButton(newTaskEditButton);
+        EventHandler.activateTaskButtons(newTaskEditButton, newTaskDeleteButton);
         EventHandler.activateCheckbox(index+1);
         if(task.getComplete()){
             newTaskCheckbox.setAttribute("checked","checked");
@@ -620,13 +627,25 @@ const DOMManip = (()=>{
         
     };
 
+    const _confirmCancelTask = (confirmButton, cancelButton)=>{
+        confirmButton.firstElementChild.classList.remove("fa-pencil");
+        confirmButton.firstElementChild.classList.add("fa-check");
+        confirmButton.lastElementChild.textContent = "Confirm";
+        confirmButton.classList.add("confirm");
+
+        cancelButton.firstElementChild.classList.remove("fa-trash");
+        cancelButton.firstElementChild.classList.add("fa-xmark");
+        cancelButton.lastElementChild.textContent = "Cancel";
+    };
+
     //shows the edit task dialog when the edit task button has been pressed, defaulting with the
     //current task information
     const displayEditTask = e=>{
         const editButton = e.currentTarget;
+        const deleteButton = e.currentTarget.nextSibling;
         const projectNumber = editButton.parentElement.dataset.project;
         const taskNumber = editButton.parentElement.dataset.task;
-        const editTask = projectFunctions.getAllProjects()[projectNumber].tasks[taskNumber];
+        const editTask = projectFunctions.getAllProjects()[projectNumber].getTasks()[taskNumber];
 
         const editTaskName = _makeNewElement("input", "edit-task-name-input", "edit-task-info","",{type:"text"}, {value:editTask.getName()});
         const editTaskDescription = _makeNewElement("input", "edit-task-description-input", "edit-task-info","",{type:"text"}, {value:editTask.getDescription()});
@@ -649,25 +668,24 @@ const DOMManip = (()=>{
         editTaskPriority.appendChild(editTaskPriorityMedium);
         editTaskPriority.appendChild(editTaskPriorityHigh);
 
-        const editCancelButton = _makeNewElement("button", `project-${projectNumber}-task-${taskNumber}-edit-cancel-button`, "edit-button");
-        const editCancelIcon = _makeNewElement("i", "", "fa-solid fa-xmark edit-cancel-icon");
-        const editCancelText =_makeNewElement("span", "", "edit-cancel-text", "Cancel");
-
-        editCancelButton.appendChild(editCancelIcon);
-        editCancelButton.appendChild(editCancelText);
-
         const editTaskContainer = getElement(`#project-${projectNumber}-task-${taskNumber}-container`);
-        editTaskContainer.insertBefore(editTaskName, editTaskContainer.lastElementChild);
-        editTaskContainer.insertBefore(editTaskDescription, editTaskContainer.lastElementChild);
-        editTaskContainer.insertBefore(editTaskDate, editTaskContainer.lastElementChild);
-        editTaskContainer.insertBefore(editTaskPriority, editTaskContainer.lastElementChild);
-        editTaskContainer.appendChild(editCancelButton);
+        editTaskContainer.insertBefore(editTaskName, editTaskContainer.lastElementChild.previousSibling);
+        editTaskContainer.insertBefore(editTaskDescription, editTaskContainer.lastElementChild.previousSibling);
+        editTaskContainer.insertBefore(editTaskDate, editTaskContainer.lastElementChild.previousSibling);
+        editTaskContainer.insertBefore(editTaskPriority, editTaskContainer.lastElementChild.previousSibling);
 
-        editButton.firstElementChild.classList.remove("fa-pencil");
-        editButton.firstElementChild.classList.add("fa-check");
-        editButton.lastElementChild.textContent = "Confirm";
+        _confirmCancelTask(editButton, deleteButton);
 
         EventHandler.activateConfirmTaskEdit(editButton);
+
+    };
+
+    const displayDeleteTask = (e)=>{
+        const deleteButton = e.currentTarget;
+        const editButton = e.currentTarget.previousSibling;
+
+        _confirmCancelTask(editButton, deleteButton);
+        EventHandler.activateConfirmTaskDelete(deleteButton);
 
     };
 
@@ -764,7 +782,7 @@ const DOMManip = (()=>{
 
     return {getElement, getElements,removeText, checkNewProject, setupNewProject, cancelNewProject,
             refreshTaskSides, getNewProjInfo, updateProjectList, expandToggle, showProject, displayDeleteProject,
-            getTaskInfo, getTaskIndex, checkNewTask, displayEditProject, displayEditTask, linkProject,
+            getTaskInfo, getTaskIndex, checkNewTask, displayEditProject, displayEditTask,displayDeleteTask, linkProject,
             updateTaskList, cancelEdit, cancelProjectEdit, showToday,showOverdue, showDays, startPage,
             changeDays, sortArray};
 })();

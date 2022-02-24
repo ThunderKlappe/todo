@@ -39,6 +39,24 @@ const DOMManip = (()=>{
         }
     };
 
+    //sorts an array of tasks by the date;
+    const sortArray = taskArray =>{
+        let sortedArray = taskArray.map(ele=>ele);
+        for(let i = 1;i<sortedArray.length;i++){
+            for(let j = 0;j<sortedArray.length - 1; j++){
+                const firstTask = parse (sortedArray[j].getDate(), "MM/dd/yyyy", new Date());
+                const secondTask = parse (sortedArray[j+1].getDate(), "MM/dd/yyyy", new Date());
+                if(isBefore(secondTask,firstTask)){
+                    let placeholder = sortedArray[j];
+                    sortedArray[j] = sortedArray[j+1];
+                    sortedArray[j+1] = placeholder;
+                }
+            }
+        }
+        return sortedArray;
+
+    };
+
     //fixes strange bug where elements animated from their default state to their css styled state
     const _fixStartingAnimations = ()=>{
         const animatable = getElements(".fix-anim");
@@ -583,22 +601,15 @@ const DOMManip = (()=>{
     };
 
     //refreshes the task list to display a new or edited task
-    const updateTaskList = (taskNumber, projectNumber, index)=>{
-        const editTaskContainer = getElement(`#project-${projectNumber}-task-${taskNumber}-container`);
-        const updatedTask = projectFunctions.getAllProjects()[projectNumber].tasks[taskNumber];
-        if(editTaskContainer){
-            editTaskContainer.remove();
-        }else{
-            getElement("#add-task-container").remove();
-            _displayTaskInput();
-        }
-        _fillInTask(updatedTask, taskNumber, index);
+    const updateTaskList = ( projectNumber)=>{
         if(getElement("#todays-todo-side").classList.contains("selected")){
             showToday();
         }else if(getElement("#overdue-todo-side").classList.contains("selected")){
             showOverdue();
         }else if(getElement("#days-todo-side").classList.contains("selected")){
             changeDays();
+        }else{
+            getElement(`#project-${projectNumber}`).click();
         }
         if(!getElement("#today-toggle").classList.contains("closed")){
             _displayTodaySide();
@@ -662,11 +673,7 @@ const DOMManip = (()=>{
 
     //sets task back to original before edit was requested
     const cancelEdit = (e)=>{
-        const task = e.currentTarget.parentElement.dataset.task;
-        const project = e.currentTarget.parentElement.dataset.project;
-        const index = getTaskIndex(e);
-
-        updateTaskList(task, project, index);
+        updateTaskList(e.currentTarget.parentElement.dataset.project);
     };
 
     //builds the basic outline of any page
@@ -696,7 +703,7 @@ const DOMManip = (()=>{
         getElement(".project-container").setAttribute("data-project",projectNumber);
         _displayTitle();
         EventHandler.activateProjectButtons();
-        projectFunctions.getAllProjects()[projectNumber].tasks.forEach((task, index) => _fillInTask(task, index, index));
+        projectFunctions.getAllProjects()[projectNumber].getTasks().forEach((task, index) => _fillInTask(task, index, index));
         _displayTaskInput();
     };
 
@@ -759,7 +766,7 @@ const DOMManip = (()=>{
             refreshTaskSides, getNewProjInfo, updateProjectList, expandToggle, showProject, displayDeleteProject,
             getTaskInfo, getTaskIndex, checkNewTask, displayEditProject, displayEditTask, linkProject,
             updateTaskList, cancelEdit, cancelProjectEdit, showToday,showOverdue, showDays, startPage,
-            changeDays};
+            changeDays, sortArray};
 })();
 
 export default DOMManip;

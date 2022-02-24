@@ -20,6 +20,10 @@ export const projectFunctions = (()=>{
             _allProjects[i].tasks.forEach(task=>task.reduceProject());
         }
     };
+    const _sortTasks = projectNumber=>{
+        const sortedTasks = DOMManip.sortArray(_allProjects[projectNumber].getTasks());
+        _allProjects[projectNumber].tasks = sortedTasks.map(ele=>ele);
+    };
 
     //gets the info that was put into the input, checks if it is acceptable, adds it to the 
     //allProjects array if it is, and saves to localstorage
@@ -41,8 +45,13 @@ export const projectFunctions = (()=>{
         if(goodTask){
             const newTask = new Task(newTaskInfo.name, newTaskInfo.description, 
                 newTaskInfo.date, newTaskInfo.priority, "", newTaskInfo.project, newTaskInfo.number);
-            _allProjects[newTaskInfo.project].tasks.push(newTask);
-            DOMManip.updateTaskList(newTask.number, newTaskInfo.project, newTaskInfo.number);
+
+            const projectNumber = newTaskInfo.project;
+            _allProjects[projectNumber].tasks.push(newTask);
+
+            _sortTasks(projectNumber);
+
+            DOMManip.updateTaskList(projectNumber);
             dataStorage.saveData();
         }
     };
@@ -64,14 +73,14 @@ export const projectFunctions = (()=>{
 
     const confirmTaskEdit = (e)=>{
         const editTask = e.currentTarget.parentElement.dataset.task;
-        const editProject = e.currentTarget.parentElement.dataset.project;
-        const index = DOMManip.getTaskIndex(e);
-        const editTaskInfo = DOMManip.getTaskInfo(editTask, editProject);
+        const projectNumber = e.currentTarget.parentElement.dataset.project;
+        const editTaskInfo = DOMManip.getTaskInfo(editTask, projectNumber);
         const goodTask = DOMManip.checkNewTask(e, editTaskInfo);
         if(goodTask){
             _allProjects[editTaskInfo.project].tasks[editTask]=new Task(editTaskInfo.name, editTaskInfo.description, 
                 editTaskInfo.date, editTaskInfo.priority, "", editTaskInfo.project, editTaskInfo.number);
-            DOMManip.updateTaskList(editTask, editProject, index);
+            _sortTasks(projectNumber);
+            DOMManip.updateTaskList(projectNumber,);
             dataStorage.saveData();
         }
     };

@@ -111,9 +111,18 @@ const DOMManip = (()=>{
         addProjectButtonContainer.appendChild(addProjctButton);
         addProjectButtonWrapper.appendChild(addProjectButtonContainer);
 
+        const clearAllButtonContainer = _makeNewElement("div", "clear-all-button-container");
+        const clearAllButton = _makeNewElement("button", "clear-all-button", "edit-button delete fix-anim");
+        const clearAllIcon = _makeNewElement("i", "", "fa-solid fa-trash-can edit-icon");
+        const clearAllText = _makeNewElement("span", "clear-all-button-text", "fix-anim", "Clear All Data");
+        clearAllButton.appendChild(clearAllIcon);
+        clearAllButton.appendChild(clearAllText);
+        clearAllButtonContainer.appendChild(clearAllButton);
+
         content.appendChild(sidePanel);
         content.appendChild(mainDisplay);
         content.appendChild(addProjectButtonWrapper);
+        content.appendChild(clearAllButtonContainer);
         document.body.appendChild(content);
 
     };
@@ -768,6 +777,15 @@ const DOMManip = (()=>{
         
     };
 
+    const confirmClearAll = (e)=>{
+        e.currentTarget.lastElementChild.textContent = "Click here again to clear all data";
+        EventHandler.activateConfirmClearAll();
+    };
+
+    const cancelClearAll = (e)=>{
+        e.currentTarget.lastElementChild.textContent = "Clear All Data";
+        EventHandler.activateClearAllButton();
+    };
     //initalizes the webpage and starts the basic listeners
     const startPage = ()=>{
         _makeStartingPage();
@@ -784,7 +802,7 @@ const DOMManip = (()=>{
             refreshTaskSides, getNewProjInfo, updateProjectList, expandToggle, showProject, displayDeleteProject,
             getTaskInfo, getTaskIndex, checkNewTask, displayEditProject, displayEditTask,displayDeleteTask, linkProject,
             updateTaskList, cancelEdit, cancelProjectEdit, showToday,showOverdue, showDays, startPage,
-            changeDays, sortArray};
+            changeDays, sortArray, confirmClearAll, cancelClearAll};
 })();
 
 export default DOMManip;

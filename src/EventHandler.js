@@ -15,10 +15,18 @@ const EventHandler = (()=>{
         DOMManip.getElement("#add-project-button").removeEventListener("click", DOMManip.cancelNewProject);
         DOMManip.getElement("#add-project-button").addEventListener("click", DOMManip.setupNewProject);
     };
+    const activateClearAllButton = ()=>{ 
+        DOMManip.getElement("#clear-all-button").removeEventListener("mouseleave", DOMManip.cancelClearAll);
+        DOMManip.getElement("#clear-all-button").removeEventListener("click", DOMManip.confirmClearAll);
+        DOMManip.getElement("#clear-all-button").removeEventListener("click", projectFunctions.confirmAllClear);
+        DOMManip.getElement("#clear-all-button").addEventListener("click", DOMManip.confirmClearAll);
+
+    };
 
     //activates the listeners for all of clickable buttons at the start of the page load
     const initStartingListeners = ()=>{
         activateAddButton();
+        activateClearAllButton();
         DOMManip.getElements(".dropdown-toggle").forEach(ele =>ele.addEventListener("click", DOMManip.expandToggle,  {capture:true}));
     };
 
@@ -120,11 +128,19 @@ const EventHandler = (()=>{
         DOMManip.getElement(".days-selector").addEventListener("change", DOMManip.changeDays);
     };
 
+    const activateConfirmClearAll = ()=>{
+        DOMManip.getElement("#clear-all-button").removeEventListener("click", DOMManip.confirmClearAll);
+        DOMManip.getElement("#clear-all-button").addEventListener("click", projectFunctions.confirmAllClear);
+        DOMManip.getElement("#clear-all-button").addEventListener("mouseleave", DOMManip.cancelClearAll);
+
+
+    };
+
     return{ activateAddButton, initStartingListeners, addProjectSubmission,activateToday, activateProjects, 
             activateOverdue, activateSides, clearTextBox, activateProjectButtons, activateAddTaskButton, 
             activateCheckbox, activateProjectLink, activateTaskButtons, activateConfirmProjectEdit, 
             activateConfirmTaskEdit,activateConfirmTaskDelete, activateCancelButton, activateDeleteProject, 
-            activateDaysSelector};
+            activateDaysSelector, activateClearAllButton, activateConfirmClearAll};
 })();
 
 

@@ -31,7 +31,11 @@ const dataStorage = (()=>{
         else return [];
     };
 
-    return{saveData, loadData};
+    const clearData = ()=>{
+        localStorage.setItem("Projects", "");
+    };
+
+    return{saveData, loadData, clearData};
 })();
 
 export default dataStorage;

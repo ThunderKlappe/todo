@@ -142,14 +142,23 @@ export const projectFunctions = (()=>{
     };
     const getCurrentDays = ()=> _currentDaysRequested;
     const setCurrentDays = (newValue) => _currentDaysRequested = newValue;
+
     //saves the loaded projects from localstorage into the allprojects array
     const loadProjects = ()=>{
         _allProjects = dataStorage.loadData();
 
     };
+    const confirmAllClear = ()=>{
+        dataStorage.clearData();
+        _allProjects= dataStorage.loadData();
+        DOMManip.updateProjectList();
+        DOMManip.refreshTaskSides();
+        DOMManip.showToday();
+
+    };
 
     return {addProject, addTask, confirmProjectEdit, confirmTaskEdit, confirmTaskDelete, deleteProject, toggleTaskComplete,
-            getAllProjects, loadProjects, getCurrentDays, setCurrentDays};
+            getAllProjects, loadProjects, getCurrentDays, setCurrentDays, confirmAllClear};
 
 })();
 
